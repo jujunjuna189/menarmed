@@ -15,8 +15,8 @@
                         <div class="card-body text-center pt-3">
                             <h2 class="fw-bold mb-3">{{ $qrcode->title }}</h2>
                             <div class="mt-3">
-                                <h3 class="mb-0"><strong>Spartan Mobile</strong></h3>
-                                <p class="small">Copyright By Aplication Spartan</p>
+                                <h3 class="mb-0"><strong>Menarmed Mobile</strong></h3>
+                                <p class="small">Copyright By Aplication Menarmed</p>
                             </div>
                         </div>
                     </div>

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Dashboard - Spartan</title>
+    <title>Dashboard - {{ env('APP_NAME') }}</title>
     <!-- CSS files -->
     <link href="{{ asset('assets/dist/libs/dropzone/dropzone.css') }}" rel="stylesheet" />
     <!-- Tabler -->
@@ -37,7 +37,7 @@
                 </button>
                 <h1 class="navbar-brand navbar-brand-autodark">
                     <a href=".">
-                        <h2>Spartan Admin</h2>
+                        <h2>{{ env('APP_NAME') }}</h2>
                     </a>
                 </h1>
                 <div class="collapse navbar-collapse" id="navbar-menu">
@@ -404,8 +404,8 @@
                             <ul class="list-inline list-inline-dots mb-0">
                                 <li class="list-inline-item">
                                     Copyright &copy; 2022
-                                    <a href="." class="link-secondary">Tamarunang</a>.
-                                    Armed 6 Makasar
+                                    <a href="." class="link-secondary">hplbz</a>.
+                                    Menarmed 1 Purwakarta
                                 </li>
                                 <li class="list-inline-item">
                                     <a href="./changelog.html" class="link-secondary" rel="noopener">
