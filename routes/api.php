@@ -69,6 +69,8 @@ Route::post('/artikel/store', [App\Http\Controllers\Api\Artikel\ArtikelControlle
 // E-Learning
 Route::post('/e-learning/show', [App\Http\Controllers\Api\ELearning\ELearningController::class, 'show']);
 Route::post('/e-learning/store', [App\Http\Controllers\Api\ELearning\ELearningController::class, 'store']);
+// Bujuk
+Route::post('/bujuk/show', [App\Http\Controllers\Api\Bujuk\BujukController::class, 'show']);
 //Rekap Data
 Route::post('/report/absensi', [App\Http\Controllers\Api\Report\ReportController::class, 'absensi']);
 Route::post('/report/perizinan', [App\Http\Controllers\Api\Report\ReportController::class, 'perizinan']);

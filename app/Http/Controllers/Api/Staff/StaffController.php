@@ -14,27 +14,27 @@ class StaffController extends Controller
             $response = [
                 (object)[
                     "name" => "Staf Intel",
-                    "url" => "https://google.com",
+                    "url" => "https://drive.google.com/drive/folders/1-H7MZWOHf2PTDOsU1ca-1IOJnCEN-Qlx",
                 ],
                 (object)[
                     "name" => "Staf Ops",
-                    "url" => "https://google.com",
+                    "url" => "https://drive.google.com/drive/folders/1LssJe7NUT8fsGbWIgLX-ioGdUVY7ZfvJ?usp=share_link",
                 ],
                 (object)[
                     "name" => "Staf Pers",
-                    "url" => "https://google.com",
+                    "url" => "https://drive.google.com/drive/folders/1Uy6q7nb36Kvg_giGSVVB8LNKwtfo0TlN?usp=share_link",
                 ],
                 (object)[
                     "name" => "Staf Log",
-                    "url" => "https://google.com",
+                    "url" => "https://drive.google.com/drive/folders/11cydmF4MfREMdaVe7toMZrXngBMFKYuK",
                 ],
                 (object)[
                     "name" => "Staf Ter",
-                    "url" => "https://google.com",
+                    "url" => "https://drive.google.com/drive/folders/1M90g5gI36S9QsIz0iH-puukTa-6T_1P5?usp=share_link",
                 ],
                 (object)[
                     "name" => "Staf Ren",
-                    "url" => "https://google.com",
+                    "url" => "https://drive.google.com/drive/folders/13Eva-aVIoL6rUjX9_bEM_xVcQI76d9VH?usp=share_link",
                 ],
             ];
 

@@ -73,13 +73,6 @@ class QrCodeSeeder extends Seeder
                 'created_at' => date('Y-m-d h:i:s'),
                 'updated_at' => date('Y-m-d h:i:s'),
             ],
-            [
-                'title' => 'Absensi',
-                'key' => 6,
-                'code' => '06-qwerty',
-                'created_at' => date('Y-m-d h:i:s'),
-                'updated_at' => date('Y-m-d h:i:s'),
-            ],
         ];
 
         QrCodeModel::insert($array);
