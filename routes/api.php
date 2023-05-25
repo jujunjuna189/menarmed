@@ -47,6 +47,8 @@ Route::post('/perizinan/kendaraan/store', [App\Http\Controllers\Api\Perizinan\Pe
 Route::post('/gudang_senjata/store', [App\Http\Controllers\Api\GudangSenjata\GudangSenjataController::class, 'store']);
 // Logistik
 Route::post('/logistik/store', [App\Http\Controllers\Api\Logistik\LogistikController::class, 'store']);
+// Staff
+Route::post('/staff/show', [App\Http\Controllers\Api\Staff\StaffController::class, 'show']);
 //Pejabat armed
 Route::post('/armed/show', [App\Http\Controllers\Api\Pejabat\ArmedController::class, 'show']);
 Route::post('/armed/store', [App\Http\Controllers\Api\Pejabat\ArmedController::class, 'store']);
