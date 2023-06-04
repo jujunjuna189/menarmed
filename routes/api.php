@@ -79,7 +79,12 @@ Route::post('/report/kendaraan', [App\Http\Controllers\Api\Report\ReportControll
 Route::post('/report/gudang_senjata', [App\Http\Controllers\Api\Report\ReportController::class, 'gudang_senjata']);
 Route::post('/report/logistik', [App\Http\Controllers\Api\Report\ReportController::class, 'logistik']);
 // Pengaturan
+// Marquee
+Route::post('/setting/marquee/store', [App\Http\Controllers\Api\Pengaturan\TextMarqueeController::class, 'store']);
+// Slider
 Route::post('/setting/slider/store', [App\Http\Controllers\Api\Pengaturan\SliderController::class, 'store']);
 Route::post('/setting/slider/delete', [App\Http\Controllers\Api\Pengaturan\SliderController::class, 'delete']);
 // Fitur
 Route::post('/feature/slider/show', [App\Http\Controllers\Api\Pengaturan\SliderController::class, 'show']);
+// Marquee
+Route::post('/feature/marquee/show', [App\Http\Controllers\Api\Pengaturan\TextMarqueeController::class, 'show']);
