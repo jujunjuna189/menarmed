@@ -10,13 +10,18 @@ use App\Models\PerizinanKendaraanModel;
 use App\Models\PerizinanModel;
 use App\Models\PerizinanRanpurModel;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ReportController extends Controller
 {
-    public function absensi()
+    public function absensi(Request $request)
     {
-        $data['report'] = AbsensiModel::orderBy('id', 'desc')->get();
-        $data['no'] = 1;
+        $data['report'] = QueryBuilder::for(AbsensiModel::class)->orderBy('id', 'desc')
+            ->jsonPaginate(10)->appends($request->input());
+        $data['no'] = 0;
+        $data['controller'] = $this;
+
+        // return $data;
         return view('rekap_data.absensi', $data);
     }
 

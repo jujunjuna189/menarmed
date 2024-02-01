@@ -46,7 +46,7 @@
                         @foreach($report as $val)
                         <tr>
                             <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                            <td>{{ $no++ }}</td>
+                            <td>{{ $report->firstItem() + ($no++) }}</td>
                             <td>{{ $val->userModel->name ?? '-' }}</td>
                             <td>{{ $val->ket }}</td>
                             <td>{{ $val->latitude }}</td>
@@ -58,10 +58,10 @@
                 </table>
             </div>
             <div class="card-footer d-flex align-items-center">
-                <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+                <p class="m-0 text-muted">Showing <span>{{$report->firstItem()}}</span> to <span>{{$report->lastItem()}}</span> of <span>{{$report->total()}}</span> entries</p>
                 <ul class="pagination m-0 ms-auto">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <li class="page-item">
+                        <a class="page-link" href="{{$controller->prevPagination($report->currentPage())->link}}">
                             <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -70,13 +70,11 @@
                             prev
                         </a>
                     </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    @foreach($controller->counterPagination($report->lastPage(), $report->currentPage()) as $val)
+                    <li class="page-item {{$val->is_active ? 'active' : ''}}"><a class="page-link" href="{{$val->link}}">{{$val->lable}}</a></li>
+                    @endforeach
                     <li class="page-item">
-                        <a class="page-link" href="#">
+                        <a class="page-link" href="{{$controller->nextPagination($report->currentPage(), $report->lastPage())->link}}">
                             next
                             <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
