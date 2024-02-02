@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('tempat_lahir')->nullable();
             $table->date('tgl_lahir')->nullable();
             $table->string('agama')->nullable();
-            $table->string('gol_darah', 2)->nullable();
+            $table->string('gol_darah', 5)->nullable();
             $table->string('sumber_pa')->nullable();
             $table->string('jabatan')->nullable();
             $table->string('thumbnail')->nullable();
