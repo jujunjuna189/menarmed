@@ -14,27 +14,27 @@ class StaffController extends Controller
             $response = [
                 (object)[
                     "name" => "Staf Intel",
-                    "url" => "https://drive.google.com/drive/folders/1pExpVtdzpQNrkRBY79lWOElLvD-c_53F",
+                    "url" => "https://drive.google.com/drive/folders/1NzO_3bNkPrHHv_D3_YWKJSpaV5UM1Blh",
                 ],
                 (object)[
                     "name" => "Staf Ops",
-                    "url" => "https://drive.google.com/drive/folders/1LssJe7NUT8fsGbWIgLX-ioGdUVY7ZfvJ?usp=share_link",
+                    "url" => "https://drive.google.com/drive/folders/1LtEcH2fxFKGSCZfQQF1ZHeoUvtD_YOYp?usp=drive_link",
                 ],
                 (object)[
                     "name" => "Staf Pers",
-                    "url" => "https://drive.google.com/drive/folders/1Uy6q7nb36Kvg_giGSVVB8LNKwtfo0TlN?usp=share_link",
+                    "url" => "https://drive.google.com/drive/folders/164o-nOwVOVZWltMC3qKfe66DnplziLac",
                 ],
                 (object)[
                     "name" => "Staf Log",
-                    "url" => "https://drive.google.com/drive/folders/11cydmF4MfREMdaVe7toMZrXngBMFKYuK",
+                    "url" => "https://drive.google.com/drive/folders/11cydmF4MfREMdaVe7toMZrXngBMFKYuK?usp=sharing",
                 ],
                 (object)[
                     "name" => "Staf Ter",
-                    "url" => "https://drive.google.com/drive/folders/1M90g5gI36S9QsIz0iH-puukTa-6T_1P5?usp=share_link",
+                    "url" => "https://drive.google.com/drive/folders/1SWrPfz166bTb9aTyvYJp3vzYI6izNARr?usp=drive_link",
                 ],
                 (object)[
                     "name" => "Staf Ren",
-                    "url" => "https://drive.google.com/drive/folders/13Eva-aVIoL6rUjX9_bEM_xVcQI76d9VH?usp=share_link",
+                    "url" => "https://drive.google.com/drive/folders/1mEgxgOBZvh0R2K0G-DcmtCEhFN63_Gnd",
                 ],
             ];
 

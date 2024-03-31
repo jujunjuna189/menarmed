@@ -12,13 +12,14 @@ use App\Models\PerizinanRanpurModel;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ReportController extends Controller
 {
-    public function absensi()
+    public function absensi(Request $request)
     {
         try {
-            $absensi = AbsensiModel::orderBy('id', 'desc')->get();
+            $absensi = QueryBuilder::for(AbsensiModel::class)->orderBy('id', 'desc')->jsonPaginate(20)->appends($request->input());
             $response = [];
             foreach ($absensi as $val) {
                 $response[] = [
