@@ -71,6 +71,8 @@ Route::post('/e-learning/show', [App\Http\Controllers\Api\ELearning\ELearningCon
 Route::post('/e-learning/store', [App\Http\Controllers\Api\ELearning\ELearningController::class, 'store']);
 // Bujuk
 Route::post('/bujuk/show', [App\Http\Controllers\Api\Bujuk\BujukController::class, 'show']);
+// Saran dan Masukan
+Route::post('/saran/store', [App\Http\Controllers\Api\Saran\SaranController::class, 'store']);
 //Rekap Data
 Route::post('/report/absensi', [App\Http\Controllers\Api\Report\ReportController::class, 'absensi']);
 Route::post('/report/perizinan', [App\Http\Controllers\Api\Report\ReportController::class, 'perizinan']);
