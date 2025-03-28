@@ -80,6 +80,7 @@ Route::post('/report/ranpur', [App\Http\Controllers\Api\Report\ReportController:
 Route::post('/report/kendaraan', [App\Http\Controllers\Api\Report\ReportController::class, 'kendaraan']);
 Route::post('/report/gudang_senjata', [App\Http\Controllers\Api\Report\ReportController::class, 'gudang_senjata']);
 Route::post('/report/logistik', [App\Http\Controllers\Api\Report\ReportController::class, 'logistik']);
+Route::post('/report/saran', [App\Http\Controllers\Api\Report\ReportController::class, 'saran']);
 // Pengaturan
 // Marquee
 Route::post('/setting/marquee/store', [App\Http\Controllers\Api\Pengaturan\TextMarqueeController::class, 'store']);

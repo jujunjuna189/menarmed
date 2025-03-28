@@ -9,6 +9,7 @@ use App\Models\LogistikModel;
 use App\Models\PerizinanKendaraanModel;
 use App\Models\PerizinanModel;
 use App\Models\PerizinanRanpurModel;
+use App\Models\SaranModel;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -225,6 +226,39 @@ class ReportController extends Controller
                     'status' => 'Failed',
                     'data' => [],
                 ], 300);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'Server Error',
+                'data' => [],
+            ], 500);
+        }
+    }
+
+    public function saran()
+    {
+        try {
+            $saran = SaranModel::orderBy('id', 'desc')->get();
+            $response = [];
+            foreach ($saran as $val) {
+                $response[] = [
+                    'from_display' => $val->from_display ?? '-',
+                    'message' => $val->message ?? '-',
+                    'created_at' => Carbon::make($val->created_at)->format('Y-M-d H:i:s'),
+                    'updated_at' => Carbon::make($val->updated_at)->format('Y-M-d H:i:s'),
+                ];
+            }
+
+            if ($response) {
+                return response()->json([
+                    'status' => 'Success',
+                    'data' => $response,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'Data kosong',
+                    'data' => [],
+                ], 404);
             }
         } catch (Exception $e) {
             return response()->json([
