@@ -3,8 +3,13 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header justify-content-between">
                 <h3 class="card-title">{{ $role->role }}</h3>
+                @if($role->role == 'Admin')
+                <div>
+                    <span class="btn bg-blue-lt border-dashed" onclick="openModalUser()">Tambah Admin</span>
+                </div>
+                @endif
             </div>
             <div class="card-body border-bottom py-3">
                 <div class="d-flex">
@@ -125,6 +130,30 @@
     </div>
 </div>
 @endsection
+@section('modal')
+<div class="modal modal-blur fade" id="modal-user" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                <div id="list-user">
+                    <div class="border p-3 rounded bg-white"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                    Batal
+                </a>
+                <div class="ms-auto">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
 @push('script')
 <script>
     const _inputSearch = 'input[name="search"]';
@@ -132,6 +161,62 @@
     const onSearch = () => {
         let searchData = $(_inputSearch).val();
         location.href = "<?= url()->current() . '?filter[name]=' ?>" + searchData + "<?= '&key=' . $role->key ?>";
+    }
+</script>
+@endpush
+@push('script')
+<script>
+    let _modal_user = '#modal-user';
+    let _modal_list_user = '#modal-user #list-user';
+
+    const openModalUser = () => {
+        $(_modal_user).modal("show");
+        getUser();
+    }
+
+    const closeModal = () => {
+        $(_modal_user).modal("hide");
+    }
+
+    const getUser = () => {
+        requestServer({
+            url: url + '/pengguna/json?key=3',
+            type: 'get',
+            onLoader: true,
+            onSuccess: function(value) {
+                close_swal(false);
+                $(_modal_list_user).empty();
+                $.each(value.data.pengguna, (index, item) => {
+                    var element = `<div class="border py-2 px-3 rounded bg-white mb-1" style="display: flex; justify-content: space-between">
+                        <div>
+                            ${item.name}
+                            <div class="">${item.email}</div>
+                        </div>
+                        <div>
+                            <div class="btn btn-primary px-2 py-2" onclick="saveAdmin(${item.id})">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round" ><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            </div>
+                        </div>
+                    </div>`;
+                    $(_modal_list_user).append(element);
+                });
+            },
+        });
+    }
+
+    const saveAdmin = (id) => {
+        requestServer({
+            url: url + '/pengguna/update-role',
+            data: {
+                id: id
+            },
+            onLoader: true,
+            onSuccess: function(value) {
+                close_swal(true, 'Berhasil Tambah Admin', 'success');
+                closeModal();
+                reloadPage();
+            },
+        });
     }
 </script>
 @endpush

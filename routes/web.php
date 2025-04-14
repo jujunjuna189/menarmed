@@ -41,7 +41,9 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/generate', [App\Http\Controllers\Admin\QrCode\QrCodeController::class, 'generate'])->name('generate');
     // Pengguna
     Route::get('/pengguna', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'index'])->name('pengguna');
+    Route::get('/pengguna/json', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'indexJson'])->name('pengguna.json');
     Route::get('/pengguna/view', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'view'])->name('pengguna.view');
+    Route::post('/pengguna/update-role', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updateRole'])->name('pengguna.update_role');
     // Pejabat
     Route::get('/pejabat', [App\Http\Controllers\Admin\Pejabat\PejabatController::class, 'index'])->name('pejabat');
     // Saran

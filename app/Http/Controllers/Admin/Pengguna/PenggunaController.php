@@ -56,6 +56,32 @@ class PenggunaController extends Controller
     }
 
     /**
+     * pengguna first page function
+     * @return view
+     * @var key<int> exp: 1, 1
+     */
+    public function indexJson(Request $request)
+    {
+        $role_key = $request->key;
+        $pengguna = QueryBuilder::for(User::class)
+            ->where('role', $role_key)
+            ->orderBy('name', 'asc')
+            ->allowedFilters('name')
+            ->get();
+
+        $data['pengguna'] = $pengguna;
+        $data['role'] = $pengguna[0]->roleModel;
+        $data['table'] = $this->tableSetting($role_key);
+        $data['no'] = 1;
+
+        return response()->json([
+            "status" => "success",
+            "message" => "Berhasil mengambil user",
+            "data" => $data,
+        ]);
+    }
+
+    /**
      * view pengguna
      * @var user_id int require
      */
@@ -64,5 +90,23 @@ class PenggunaController extends Controller
         $data['user'] = User::find($request->user_id);
 
         return view('pengguna.view', $data);
+    }
+
+    /**
+     * pengguna update role only function
+     */
+    public function updateRole(Request $request)
+    {
+
+        $pengguna = User::find($request->id);
+
+        $pengguna->role = 1;
+        $pengguna->save();
+
+        return response()->json([
+            "status" => "success",
+            "message" => "Berhasil mengambil user",
+            "data" => $pengguna,
+        ]);
     }
 }
