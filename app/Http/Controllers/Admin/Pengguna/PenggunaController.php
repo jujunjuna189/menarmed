@@ -18,7 +18,7 @@ class PenggunaController extends Controller
         switch ($role) {
             case 1: // Admin
                 $column['kemampuan'] = false;
-                $column['aksi'] = false;
+                $column['aksi'] = true;
                 break;
             case 3: // Personil
                 $column['kemampuan'] = true;
@@ -100,12 +100,12 @@ class PenggunaController extends Controller
 
         $pengguna = User::find($request->id);
 
-        $pengguna->role = 1;
+        $pengguna->role = $request->role ?? 1;
         $pengguna->save();
 
         return response()->json([
             "status" => "success",
-            "message" => "Berhasil mengambil user",
+            "message" => "Berhasil mengubah user",
             "data" => $pengguna,
         ]);
     }
