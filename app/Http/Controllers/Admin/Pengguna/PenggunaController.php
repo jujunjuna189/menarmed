@@ -48,7 +48,7 @@ class PenggunaController extends Controller
             ->get();
 
         $data['pengguna'] = $pengguna;
-        $data['role'] = $pengguna[0]->roleModel;
+        $data['role'] = \App\Models\RoleModel::where('key', $role_key)->first();
         $data['table'] = $this->tableSetting($role_key);
         $data['no'] = 1;
 
@@ -70,7 +70,7 @@ class PenggunaController extends Controller
             ->get();
 
         $data['pengguna'] = $pengguna;
-        $data['role'] = $pengguna[0]->roleModel;
+        $data['role'] = \App\Models\RoleModel::where('key', $role_key)->first();
         $data['table'] = $this->tableSetting($role_key);
         $data['no'] = 1;
 
@@ -108,5 +108,51 @@ class PenggunaController extends Controller
             "message" => "Berhasil mengubah user",
             "data" => $pengguna,
         ]);
+    }
+
+    /**
+     * Import user from excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,excel,xls'
+        ]);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\UsersImport, $request->file('file'));
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berhasil import data pengguna'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal import data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Download template for user import
+     */
+    public function downloadTemplate()
+    {
+        return response()->streamDownload(function() {
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Header
+            $headers = ['nama', 'email', 'password', 'role_id', 'pangkat', 'korp', 'satuan', 'jabatan', 'tempat_lahir', 'tgl_lahir', 'agama', 'gol_darah', 'sumber_pa', 'senjata'];
+            $sheet->fromArray([$headers], NULL, 'A1');
+
+            // Sample Data
+            $sample = ['Contoh User', 'user@example.com', 'password123', '3', 'Serda', 'CPL', 'Satuan A', 'Anggota', 'Jakarta', '1990-01-01', 'Islam', 'A', 'Akamil', 'M16'];
+            $sheet->fromArray([$sample], NULL, 'A2');
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, 'template_import_user.xlsx');
     }
 }

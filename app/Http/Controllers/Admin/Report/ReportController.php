@@ -16,20 +16,162 @@ class ReportController extends Controller
 {
     public function absensi(Request $request)
     {
-        $data['report'] = QueryBuilder::for(AbsensiModel::class)->orderBy('id', 'desc')
-            ->jsonPaginate(10)->appends($request->input());
+        $startDate = $request->get('start_date', date('Y-m-01'));
+        $endDate = $request->get('end_date', date('Y-m-t'));
+        $search = $request->get('filter', []);
+        $pageSize = $request->input('page.size', 10);
+
+        $query = AbsensiModel::with('userModel')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereHas('userModel', function($q) use ($search) {
+                if (isset($search['name'])) {
+                    $q->where('name', 'like', '%' . $search['name'] . '%');
+                }
+            })
+            ->orderBy('id', 'desc');
+
+        $data['report'] = QueryBuilder::for($query)
+            ->jsonPaginate($pageSize)->appends($request->input());
+            
         $data['no'] = 0;
         $data['controller'] = $this;
+        $data['start_date'] = $startDate;
+        $data['end_date'] = $endDate;
+        $data['page_size'] = $pageSize;
+        $data['search_name'] = $search['name'] ?? '';
 
-        // return $data;
         return view('rekap_data.absensi', $data);
     }
 
-    public function perizinan()
+    public function updateAbsensi(Request $request, $id)
     {
-        $data['report'] = PerizinanModel::orderBy('id', 'desc')->get();
+        $request->validate([
+            'ket' => 'required|string|max:255',
+            'created_at' => 'required|date',
+        ]);
+
+        $absensi = AbsensiModel::findOrFail($id);
+        $absensi->update([
+            'ket' => $request->ket,
+            'created_at' => $request->created_at,
+        ]);
+
+        return redirect()->back()->with('success', 'Data absensi berhasil diperbarui.');
+    }
+
+    public function exportAbsensi(Request $request)
+    {
+        $startDate = $request->get('start_date', date('Y-m-01'));
+        $endDate = $request->get('end_date', date('Y-m-t'));
+        $search = $request->get('filter', []);
+        
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\AbsensiExport($startDate, $endDate, $search), 'rekap_absensi_' . $startDate . '_to_' . $endDate . '.xlsx');
+    }
+
+    public function exportAbsensiPdf(Request $request)
+    {
+        ini_set('memory_limit', '1024M');
+        set_time_limit(0);
+
+        $startDate = $request->get('start_date', date('Y-m-01'));
+        $endDate = $request->get('end_date', date('Y-m-t'));
+        $search = $request->get('filter', []);
+
+        $query = AbsensiModel::with('userModel')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereHas('userModel', function($q) use ($search) {
+                if (isset($search['name'])) {
+                    $q->where('name', 'like', '%' . $search['name'] . '%');
+                }
+            })
+            ->orderBy('id', 'desc');
+
+        $data['report'] = $query->get();
+            
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('rekap_data.absensi_pdf', $data);
+        return $pdf->download('rekap_absensi_' . $startDate . '_to_' . $endDate . '.pdf');
+    }
+
+    public function perizinan(Request $request)
+    {
+        $startDate = $request->get('start_date', date('Y-m-01'));
+        $endDate = $request->get('end_date', date('Y-m-t'));
+        $search = $request->get('filter', []);
+        $pageSize = $request->input('page.size', 10);
+
+        $query = PerizinanModel::with('userModel')
+            ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereHas('userModel', function($q) use ($search) {
+                if (isset($search['name'])) {
+                    $q->where('name', 'like', '%' . $search['name'] . '%');
+                }
+            })
+            ->orderBy('id', 'desc');
+
+        $data['report'] = QueryBuilder::for($query)
+            ->jsonPaginate($pageSize)->appends($request->input());
+            
         $data['no'] = 1;
+        $data['controller'] = $this;
+        $data['start_date'] = $startDate;
+        $data['end_date'] = $endDate;
+        $data['page_size'] = $pageSize;
+        $data['search_name'] = $search['name'] ?? '';
+        
         return view('rekap_data.perizinan', $data);
+    }
+
+    public function updatePerizinan(Request $request, $id)
+    {
+        $request->validate([
+            'tujuan' => 'required|string|max:255',
+            'jenis_kendaraan' => 'required|string|max:255',
+            'keluar' => 'required|date',
+            'masuk' => 'required|date',
+        ]);
+
+        $perizinan = PerizinanModel::findOrFail($id);
+        $perizinan->update([
+            'tujuan' => $request->tujuan,
+            'jenis_kendaraan' => $request->jenis_kendaraan,
+            'keluar' => $request->keluar,
+            'masuk' => $request->masuk,
+        ]);
+
+        return redirect()->back()->with('success', 'Data perizinan berhasil diperbarui.');
+    }
+
+    public function exportPerizinan(Request $request)
+    {
+        $startDate = $request->get('start_date', date('Y-m-01'));
+        $endDate = $request->get('end_date', date('Y-m-t'));
+        $search = $request->get('filter', []);
+        
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PerizinanExport($startDate, $endDate, $search), 'rekap_perizinan_' . $startDate . '_to_' . $endDate . '.xlsx');
+    }
+
+    public function exportPerizinanPdf(Request $request)
+    {
+        ini_set('memory_limit', '1024M');
+        set_time_limit(0);
+
+        $startDate = $request->get('start_date', date('Y-m-01'));
+        $endDate = $request->get('end_date', date('Y-m-t'));
+        $search = $request->get('filter', []);
+
+        $query = PerizinanModel::with('userModel')
+            ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereHas('userModel', function($q) use ($search) {
+                if (isset($search['name'])) {
+                    $q->where('name', 'like', '%' . $search['name'] . '%');
+                }
+            })
+            ->orderBy('id', 'desc');
+
+        $data['report'] = $query->get();
+            
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('rekap_data.perizinan_pdf', $data);
+        return $pdf->download('rekap_perizinan_' . $startDate . '_to_' . $endDate . '.pdf');
     }
 
     public function ranpur()

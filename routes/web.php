@@ -27,6 +27,8 @@ Route::get('/artikel/view', [App\Http\Controllers\Admin\Artikel\ArtikelControlle
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     // Monitor
+    Route::get('/absensi/template', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'downloadTemplate'])->name('absensi.template');
+    Route::post('/absensi/import', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'import'])->name('absensi.import');
     Route::get('/absensi', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'index'])->name('absensi');
     Route::get('/track_maps', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'track_maps'])->name('track_maps');
     // Event
@@ -44,13 +46,21 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/pengguna/json', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'indexJson'])->name('pengguna.json');
     Route::get('/pengguna/view', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'view'])->name('pengguna.view');
     Route::post('/pengguna/update-role', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updateRole'])->name('pengguna.update_role');
+    Route::post('/pengguna/import', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'import'])->name('pengguna.import');
+    Route::get('/pengguna/template', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'downloadTemplate'])->name('pengguna.template');
     // Pejabat
     Route::get('/pejabat', [App\Http\Controllers\Admin\Pejabat\PejabatController::class, 'index'])->name('pejabat');
     // Saran
     Route::get('/saran', [App\Http\Controllers\Admin\Saran\SaranController::class, 'index'])->name('saran');
     // Report
     Route::get('/report/absensi', [App\Http\Controllers\Admin\Report\ReportController::class, 'absensi'])->name('report.absensi');
+    Route::put('/report/absensi/{id}', [App\Http\Controllers\Admin\Report\ReportController::class, 'updateAbsensi'])->name('report.absensi.update');
+    Route::get('/report/absensi/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportAbsensi'])->name('report.absensi.export');
+    Route::get('/report/absensi/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportAbsensiPdf'])->name('report.absensi.pdf');
     Route::get('/report/perizinan', [App\Http\Controllers\Admin\Report\ReportController::class, 'perizinan'])->name('report.perizinan');
+    Route::put('/report/perizinan/{id}', [App\Http\Controllers\Admin\Report\ReportController::class, 'updatePerizinan'])->name('report.perizinan.update');
+    Route::get('/report/perizinan/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportPerizinan'])->name('report.perizinan.export');
+    Route::get('/report/perizinan/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportPerizinanPdf'])->name('report.perizinan.pdf');
     Route::get('/report/ranpur', [App\Http\Controllers\Admin\Report\ReportController::class, 'ranpur'])->name('report.ranpur');
     Route::get('/report/kendaraan', [App\Http\Controllers\Admin\Report\ReportController::class, 'kendaraan'])->name('report.kendaraan');
     Route::get('/report/gudang_senjata', [App\Http\Controllers\Admin\Report\ReportController::class, 'gudang_senjata'])->name('report.gudang_senjata');

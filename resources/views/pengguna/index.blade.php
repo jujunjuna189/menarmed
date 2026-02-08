@@ -5,11 +5,18 @@
         <div class="card">
             <div class="card-header justify-content-between">
                 <h3 class="card-title">{{ $role->role }}</h3>
-                @if($role->role == 'Admin')
                 <div>
+                    @if($role->role == 'Admin')
                     <span class="btn bg-blue-lt border-dashed" onclick="openModalUser()">Tambah Admin</span>
+                    @else
+                    <a href="{{ route('pengguna.template') }}" class="btn bg-green-lt border-dashed">
+                        Download Format
+                    </a>
+                    <span class="btn bg-orange-lt border-dashed" onclick="openModalImport()">
+                        Import Excel
+                    </span>
+                    @endif
                 </div>
-                @endif
             </div>
             <div class="card-body border-bottom py-3">
                 <div class="d-flex">
@@ -127,6 +134,33 @@
 </div>
 @endsection
 @section('modal')
+<div class="modal modal-blur fade" id="modal-import" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Data Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-import" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">File Excel</label>
+                        <input type="file" class="form-control" name="file" accept=".xlsx, .xls">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                    Batal
+                </a>
+                <a href="#" class="btn btn-primary ms-auto" onclick="submitImport()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                    Import
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal modal-blur fade" id="modal-user" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -196,6 +230,45 @@
     const onSearch = () => {
         let searchData = $(_inputSearch).val();
         location.href = "<?= url()->current() . '?filter[name]=' ?>" + searchData + "<?= '&key=' . $role->key ?>";
+    }
+</script>
+@endpush
+@push('script')
+<script>
+    // Import
+    const openModalImport = () => {
+        $('#modal-import').modal('show');
+    }
+
+    const submitImport = () => {
+        const form = document.getElementById('form-import');
+        let formData = new FormData(form);
+
+        // Show loading state if possible or just rely on alert later
+        // You might want to add a loader here if you have a global loader function
+
+        fetch("{{ route('pengguna.import') }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                $('#modal-import').modal('hide');
+                location.reload();
+            } else {
+                alert(data.message || 'Terjadi kesalahan');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan sistem');
+        });
     }
 </script>
 @endpush
