@@ -14,27 +14,27 @@ class StaffController extends Controller
             $response = [
                 (object)[
                     "name" => "Staf Intel",
-                    "url" => "https://drive.google.com/drive/folders/1NzO_3bNkPrHHv_D3_YWKJSpaV5UM1Blh",
+                    "url" => "https://drive.google.com/drive/folders/14uIl9ksDHHdQuRyGb68lrDzcGuzJ5uTI",
                 ],
                 (object)[
                     "name" => "Staf Ops",
-                    "url" => "https://drive.google.com/drive/folders/1LtEcH2fxFKGSCZfQQF1ZHeoUvtD_YOYp?usp=drive_link",
+                    "url" => "https://drive.google.com/drive/folders/14f40m1EZa_ULKkza_vcmBtuCOAzfzHIC",
                 ],
                 (object)[
                     "name" => "Staf Pers",
-                    "url" => "https://drive.google.com/drive/folders/164o-nOwVOVZWltMC3qKfe66DnplziLac",
+                    "url" => "https://drive.google.com/drive/folders/1KGlTqo0RKLB3SJT8ZclqGjUe4IiOYh_f",
                 ],
                 (object)[
                     "name" => "Staf Log",
-                    "url" => "https://drive.google.com/drive/folders/11cydmF4MfREMdaVe7toMZrXngBMFKYuK?usp=sharing",
+                    "url" => "https://drive.google.com/drive/folders/1BFb3uSoRlj3MjTvhj5cg4iaf4KWNpGZc",
                 ],
                 (object)[
                     "name" => "Staf Ter",
-                    "url" => "https://drive.google.com/drive/folders/1SWrPfz166bTb9aTyvYJp3vzYI6izNARr?usp=drive_link",
+                    "url" => "https://drive.google.com/drive/folders/1af8z5f9ujiYwlxUxPL4TiSknMyyqagZb",
                 ],
                 (object)[
                     "name" => "Staf Ren",
-                    "url" => "https://drive.google.com/drive/folders/1mEgxgOBZvh0R2K0G-DcmtCEhFN63_Gnd",
+                    "url" => "https://drive.google.com/drive/folders/1pSFKsqeQZJ1DuJb9kgesnVwpU_y37Zwh",
                 ],
             ];
 
@@ -42,7 +42,8 @@ class StaffController extends Controller
                 'status' => 'Success',
                 'data' => $response,
             ], 200);
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return response()->json([
                 'status' => 'Server Error',
                 'data' => [],
