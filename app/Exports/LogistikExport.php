@@ -2,12 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\PerizinanModel;
+use App\Models\LogistikModel;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class PerizinanExport implements FromCollection, WithHeadings, WithMapping
+class LogistikExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $startDate;
     protected $endDate;
@@ -25,7 +25,7 @@ class PerizinanExport implements FromCollection, WithHeadings, WithMapping
     */
     public function collection()
     {
-        return PerizinanModel::with('userModel')
+        return LogistikModel::with('userModel')
             ->whereBetween('keluar', [$this->startDate . ' 00:00:00', $this->endDate . ' 23:59:59'])
             ->whereHas('userModel', function($q) {
                 if (isset($this->filters['name'])) {
@@ -43,23 +43,19 @@ class PerizinanExport implements FromCollection, WithHeadings, WithMapping
             'Nama',
             'Waktu Keluar',
             'Waktu Masuk',
-            'Tujuan',
-            'Jenis Kendaraan',
         ];
     }
 
-    public function map($perizinan): array
+    public function map($logistik): array
     {
         static $no = 0;
         $no++;
 
         return [
             $no,
-            $perizinan->userModel->name ?? '-',
-            $perizinan->keluar ? \Carbon\Carbon::make($perizinan->keluar)->format('d/m/Y H:i:s') : '-',
-            $perizinan->masuk ? \Carbon\Carbon::make($perizinan->masuk)->format('d/m/Y H:i:s') : '-',
-            $perizinan->tujuan,
-            $perizinan->jenis_kendaraan,
+            $logistik->userModel->name ?? '-',
+            $logistik->keluar,
+            $logistik->masuk,
         ];
     }
 }

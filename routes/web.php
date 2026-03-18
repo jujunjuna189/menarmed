@@ -62,6 +62,9 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/report/perizinan/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportPerizinan'])->name('report.perizinan.export');
     Route::get('/report/perizinan/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportPerizinanPdf'])->name('report.perizinan.pdf');
     Route::get('/report/ranpur', [App\Http\Controllers\Admin\Report\ReportController::class, 'ranpur'])->name('report.ranpur');
+    Route::put('/report/ranpur/{id}', [App\Http\Controllers\Admin\Report\ReportController::class, 'updateRanpur'])->name('report.ranpur.update');
+    Route::get('/report/ranpur/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportRanpur'])->name('report.ranpur.export');
+    Route::get('/report/ranpur/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportRanpurPdf'])->name('report.ranpur.pdf');
     Route::get('/report/kendaraan', [App\Http\Controllers\Admin\Report\ReportController::class, 'kendaraan'])->name('report.kendaraan');
     Route::put('/report/kendaraan/{id}', [App\Http\Controllers\Admin\Report\ReportController::class, 'updateKendaraan'])->name('report.kendaraan.update');
     Route::get('/report/kendaraan/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportKendaraan'])->name('report.kendaraan.export');
@@ -71,6 +74,9 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/report/gudang_senjata/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportGudangSenjata'])->name('report.gudang_senjata.export');
     Route::get('/report/gudang_senjata/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportGudangSenjataPdf'])->name('report.gudang_senjata.pdf');
     Route::get('/report/logistik', [App\Http\Controllers\Admin\Report\ReportController::class, 'logistik'])->name('report.logistik');
+    Route::put('/report/logistik/{id}', [App\Http\Controllers\Admin\Report\ReportController::class, 'updateLogistik'])->name('report.logistik.update');
+    Route::get('/report/logistik/export', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportLogistik'])->name('report.logistik.export');
+    Route::get('/report/logistik/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportLogistikPdf'])->name('report.logistik.pdf');
     // Pengaturan
     Route::get('/pengaturan', [App\Http\Controllers\Admin\Pengaturan\PengaturanController::class, 'index'])->name('pengaturan');
 });

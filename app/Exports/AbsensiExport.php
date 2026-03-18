@@ -32,7 +32,7 @@ class AbsensiExport implements FromCollection, WithHeadings, WithMapping
                     $q->where('name', 'like', '%' . $this->filters['name'] . '%');
                 }
             })
-            ->orderBy('id', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
     }
 
