@@ -21,14 +21,14 @@ class AbsensiSeeder extends Seeder
         // Configuration
         $year = 2025;
         $users = User::where('role', '!=', 1)->pluck('id')->toArray(); // Exclude admin if needed, or include all
-        
+
         if (empty($users)) {
             $this->command->info("No users found to generate absensi.");
             return;
         }
 
         $startDate = Carbon::create($year, 1, 1);
-        $endDate = Carbon::create($year, 12, 31);
+        $endDate = Carbon::create(2026, 4, 3);
         $period = CarbonPeriod::create($startDate, $endDate);
 
         $this->command->info("Generating Absensi for year $year...");
@@ -42,7 +42,7 @@ class AbsensiSeeder extends Seeder
         for ($q = 1; $q <= 4; $q++) {
             $quarterStart = Carbon::create($year, ($q - 1) * 3 + 1, 1);
             $quarterEnd = $quarterStart->copy()->addMonths(3)->subDay();
-            
+
             $picked = $this->pickRandom($users, 2);
             $this->assignPeriod($dailyAssignments, $picked, 'DIK', $quarterStart, $quarterEnd);
         }
@@ -68,10 +68,12 @@ class AbsensiSeeder extends Seeder
         while ($currentDate <= $endDate) {
             $weekStart = $currentDate->copy()->startOfWeek();
             $weekEnd = $currentDate->copy()->endOfWeek();
-            
+
             // Adjust to year boundaries
-            if ($weekStart->year < $year) $weekStart = Carbon::create($year, 1, 1);
-            if ($weekEnd->year > $year) $weekEnd = Carbon::create($year, 12, 31);
+            if ($weekStart->year < $year)
+                $weekStart = Carbon::create($year, 1, 1);
+            if ($weekEnd->year > $year)
+                $weekEnd = Carbon::create($year, 12, 31);
 
             $pickedSakit = $this->pickRandom($users, 2);
             $this->assignPeriod($dailyAssignments, $pickedSakit, 'SAKIT', $weekStart, $weekEnd);
@@ -90,9 +92,9 @@ class AbsensiSeeder extends Seeder
             }
 
             $dateString = $date->format('Y-m-d');
-            
+
             // ... (rest of logic for identified users)
-            
+
             // Identify who is already assigned (Long Term)
             $assignedToday = $dailyAssignments[$dateString] ?? [];
             $alreadyAssignedIds = array_keys($assignedToday);
@@ -152,7 +154,7 @@ class AbsensiSeeder extends Seeder
         if (!empty($dataToInsert)) {
             AbsensiModel::insert($dataToInsert);
         }
-        
+
         $this->command->info("Absensi data generated successfully.");
     }
 
@@ -167,10 +169,11 @@ class AbsensiSeeder extends Seeder
         // But simpler logic is to just overwrite or let the last one win. 
         // My implementation of `dailyAssignments` uses user_id as key, so last assignment wins.
         // To be safer, we should check availability, but for data dumping this is usually fine.
-        
+
         $keys = array_rand($allUsers, min($count, count($allUsers)));
-        if (!is_array($keys)) $keys = [$keys];
-        
+        if (!is_array($keys))
+            $keys = [$keys];
+
         $picked = [];
         foreach ($keys as $key) {
             $picked[] = $allUsers[$key];
@@ -192,7 +195,7 @@ class AbsensiSeeder extends Seeder
                 // So Sakit might overwrite DIK effectively if picked.
                 // Ideally we should check `isset`.
                 if (!isset($schedule[$d][$uid])) {
-                     $schedule[$d][$uid] = $status;
+                    $schedule[$d][$uid] = $status;
                 }
             }
         }

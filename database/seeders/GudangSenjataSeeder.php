@@ -34,8 +34,8 @@ class GudangSenjataSeeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2026, 3, 18);
-        
+        $endDate = Carbon::create(2026, 4, 3);
+
         $dataToInsert = [];
         $batchSize = 500;
 
@@ -71,7 +71,7 @@ class GudangSenjataSeeder extends Seeder
             // Daily Schedule: 2 groups of 12 members
             // We pick random members from the eligible list
             $dailyMembers = $eligibleUsers->random(min(24, $eligibleUsers->count()));
-            
+
             $group1 = $dailyMembers->take(12);
             $group2 = $dailyMembers->slice(12, 12);
 

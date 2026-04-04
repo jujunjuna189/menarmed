@@ -67,8 +67,8 @@ class PerizinanKendaraanSeeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2025, 3, 31);
-        
+        $endDate = Carbon::create(2026, 4, 3);
+
         $currentDate = $startDate->copy();
         $this->command->info("Seeding Perizinan Kendaraan from 1 Jan 2025 to 31 Mar 2025...");
 
@@ -76,7 +76,7 @@ class PerizinanKendaraanSeeder extends Seeder
             // Find the start and end of the current week (Monday to Sunday)
             $weekStart = $currentDate->copy()->startOfWeek();
             $weekEnd = $currentDate->copy()->endOfWeek();
-            
+
             // Adjust week limits to the overall start/end dates
             $effectiveStart = $weekStart->lt($startDate) ? $startDate : $weekStart;
             $effectiveEnd = $weekEnd->gt($endDate) ? $endDate : $weekEnd;
@@ -91,13 +91,14 @@ class PerizinanKendaraanSeeder extends Seeder
 
             // Randomly select 6 occurrences per week (some days might have more than 1)
             for ($i = 0; $i < 6; $i++) {
-                if (empty($daysInWeek)) break;
-                
+                if (empty($daysInWeek))
+                    break;
+
                 $chosenDay = $daysInWeek[array_rand($daysInWeek)];
-                
+
                 $keluarHour = rand(7, 10);
                 $durationHours = rand(2, 6);
-                
+
                 $keluar = $chosenDay->copy()->setHour($keluarHour)->setMinute(rand(0, 59))->setSecond(0);
                 $masuk = $keluar->copy()->addHours($durationHours)->addMinutes(rand(0, 59));
 

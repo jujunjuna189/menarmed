@@ -98,15 +98,15 @@ class PerizinanKendaraanQ4Seeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 10, 1);
-        $endDate = Carbon::create(2025, 12, 31);
-        
+        $endDate = Carbon::create(2026, 4, 3);
+
         $currentDate = $startDate->copy();
         $this->command->info("Seeding Perizinan Kendaraan from 1 Oct 2025 to 31 Dec 2025...");
 
         while ($currentDate->lte($endDate)) {
             $weekStart = $currentDate->copy()->startOfWeek();
             $weekEnd = $currentDate->copy()->endOfWeek();
-            
+
             $effectiveStart = $weekStart->lt($startDate) ? $startDate : $weekStart;
             $effectiveEnd = $weekEnd->gt($endDate) ? $endDate : $weekEnd;
 
@@ -118,14 +118,15 @@ class PerizinanKendaraanQ4Seeder extends Seeder
             }
 
             for ($i = 0; $i < 6; $i++) {
-                if (empty($daysInWeek)) break;
-                
+                if (empty($daysInWeek))
+                    break;
+
                 $chosenDay = $daysInWeek[array_rand($daysInWeek)];
                 $chosenGiat = $dataMapping[array_rand($dataMapping)];
-                
+
                 $keluarHour = rand(7, 10);
                 $durationHours = rand(2, 6);
-                
+
                 $keluar = $chosenDay->copy()->setHour($keluarHour)->setMinute(rand(0, 59))->setSecond(0);
                 $masuk = $keluar->copy()->addHours($durationHours)->addMinutes(rand(0, 59));
 
