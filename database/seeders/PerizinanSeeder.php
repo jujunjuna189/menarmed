@@ -19,9 +19,17 @@ class PerizinanSeeder extends Seeder
     {
         $year = 2025;
         $destinations = [
-            'Sadang', 'cikopak', 'cempaka', 'subang', 'pasar rebo', 
-            'pasar jumat', 'Ciganea', 'pasawahan', 'maracang', 
-            'sukarata', 'cipaisan'
+            'Sadang',
+            'cikopak',
+            'cempaka',
+            'subang',
+            'pasar rebo',
+            'pasar jumat',
+            'Ciganea',
+            'pasawahan',
+            'maracang',
+            'sukarata',
+            'cipaisan'
         ];
         $vehicles = ['Motor Pribadi', 'Mobil Pribadi', 'Motor Dinas', 'Mobil Dinas'];
 
@@ -32,7 +40,7 @@ class PerizinanSeeder extends Seeder
         }
 
         $startDate = Carbon::create($year, 1, 1);
-        $endDate = Carbon::create($year, 12, 31);
+        $endDate = Carbon::create(2026, 4, 3);
         $period = CarbonPeriod::create($startDate, $endDate);
 
         $this->command->info("Generating Perizinan for year $year...");
@@ -47,19 +55,20 @@ class PerizinanSeeder extends Seeder
             }
 
             $dateString = $date->format('Y-m-d');
-            
+
             // Randomly pick number of people (max 11)
             $count = rand(1, 11);
-            
+
             // Pick random users for this day
             $dailyUsers = array_rand(array_flip($users), min($count, count($users)));
-            if (!is_array($dailyUsers)) $dailyUsers = [$dailyUsers];
+            if (!is_array($dailyUsers))
+                $dailyUsers = [$dailyUsers];
 
             foreach ($dailyUsers as $uid) {
                 $keluarHour = rand(8, 16);
                 $keluarMin = rand(0, 59);
                 $durationHours = rand(1, 4);
-                
+
                 $keluar = $date->copy()->setTime($keluarHour, $keluarMin, 0);
                 $masuk = $keluar->copy()->addHours($durationHours)->addMinutes(rand(0, 59));
 
