@@ -1,6 +1,29 @@
 @extends('layouts.app_template')
 @section('content')
 <div class="row">
+    <div class="col-md-12 mb-3">
+        <div class="row row-cards">
+            @php $totalReport = $summaryData->sum('total'); @endphp
+            <div class="col-md-3 col-lg-2">
+                <div class="card">
+                    <div class="card-body p-3 text-center">
+                        <div class="text-muted mb-1 text-uppercase fw-bold">Total Entri</div>
+                        <div class="h2 mb-0">{{ $totalReport }}</div>
+                    </div>
+                </div>
+            </div>
+            @foreach($summaryData as $sum)
+            <div class="col-md-3 col-lg-2">
+                <div class="card">
+                    <div class="card-body p-3 text-center">
+                        <div class="text-muted mb-1 text-uppercase fw-bold">{{ $sum->ket }}</div>
+                        <div class="h2 mb-0 text-success">{{ $sum->total }}</div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">

@@ -40,6 +40,16 @@ class ReportController extends Controller
         $data['page_size'] = $pageSize;
         $data['search_name'] = $search['name'] ?? '';
 
+        $data['summaryData'] = \App\Models\AbsensiModel::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->whereHas('userModel', function($q) use ($search) {
+                if (isset($search['name'])) {
+                    $q->where('name', 'like', '%' . $search['name'] . '%');
+                }
+            })
+            ->select('ket', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->groupBy('ket')
+            ->get();
+
         return view('rekap_data.absensi', $data);
     }
 
