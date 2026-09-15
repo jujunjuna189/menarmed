@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Pengguna;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PenggunaController extends Controller
@@ -97,8 +98,31 @@ class PenggunaController extends Controller
      */
     public function updateRole(Request $request)
     {
+        $authUser = auth()->user();
+
+        Log::info('Masuk update role', [
+            'auth_id' => auth()->id(),
+            'auth_email' => $authUser ? $authUser->email : null,
+            'auth_role' => $authUser ? $authUser->role : null,
+            'request_id' => $request->id,
+            'request_role' => $request->role,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         $pengguna = User::find($request->id);
+
+        if (!$pengguna) {
+            Log::warning('User target update role tidak ditemukan', [
+                'request_id' => $request->id,
+                'request_role' => $request->role,
+            ]);
+
+            return response()->json([
+                "status" => "error",
+                "message" => "User tidak ditemukan",
+            ], 404);
+        }
 
         $pengguna->role = $request->role ?? 1;
         $pengguna->save();

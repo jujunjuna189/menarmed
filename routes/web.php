@@ -26,6 +26,8 @@ Route::get('/artikel/view', [App\Http\Controllers\Admin\Artikel\ArtikelControlle
 
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/log-viewer', [App\Http\Controllers\Admin\LogViewerController::class, 'index'])->name('log-viewer.index');
+    Route::get('/log-viewer/download', [App\Http\Controllers\Admin\LogViewerController::class, 'download'])->name('log-viewer.download');
     // Monitor
     Route::get('/absensi/template', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'downloadTemplate'])->name('absensi.template');
     Route::post('/absensi/import', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'import'])->name('absensi.import');

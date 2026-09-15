@@ -1,0 +1,2 @@
+[2026-09-15 09:51:47] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/pejabat","method":"GET","auth_check":true,"auth_id":1,"auth_email":"admin","auth_role":1,"allowed_roles":["1"]} 
+[2026-09-15 09:51:49] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/log-viewer","method":"GET","auth_check":true,"auth_id":1,"auth_email":"admin","auth_role":1,"allowed_roles":["1"]} 
