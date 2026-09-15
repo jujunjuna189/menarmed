@@ -51,9 +51,9 @@ class PerizinanKendaraanQ1EkstraSeeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2026, 3, 26);
+        $endDate = Carbon::create(2025, 3, 31);
         
-        $this->command->info("Adding Extra Perizinan Kendaraan for Jan 2025 - Mar 2026 (upto 26 Mar)...");
+        $this->command->info("Adding Extra Perizinan Kendaraan for Jan-Mar 2025...");
 
         $currentDate = $startDate->copy();
         while ($currentDate->lte($endDate)) {

@@ -67,10 +67,10 @@ class PerizinanKendaraanSeeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2026, 3, 26);
+        $endDate = Carbon::create(2025, 3, 31);
         
         $currentDate = $startDate->copy();
-        $this->command->info("Seeding Perizinan Kendaraan from 1 Jan 2025 to 26 Mar 2026...");
+        $this->command->info("Seeding Perizinan Kendaraan from 1 Jan 2025 to 31 Mar 2025...");
 
         while ($currentDate->lte($endDate)) {
             // Find the start and end of the current week (Monday to Sunday)

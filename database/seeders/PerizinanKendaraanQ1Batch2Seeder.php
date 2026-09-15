@@ -51,9 +51,9 @@ class PerizinanKendaraanQ1Batch2Seeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2026, 3, 26);
+        $endDate = Carbon::create(2025, 3, 31);
         
-        $this->command->info("Adding Batch 2 Extra Perizinan Kendaraan for Jan 2025 - 26 Mar 2026...");
+        $this->command->info("Adding Batch 2 Extra Perizinan Kendaraan for Jan-Mar 2025...");
 
         $currentDate = $startDate->copy();
         while ($currentDate->lte($endDate)) {

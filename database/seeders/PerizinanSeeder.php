@@ -31,11 +31,11 @@ class PerizinanSeeder extends Seeder
             return;
         }
 
-        $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2026, 3, 26);
+        $startDate = Carbon::create($year, 1, 1);
+        $endDate = Carbon::create($year, 12, 31);
         $period = CarbonPeriod::create($startDate, $endDate);
 
-        $this->command->info("Generating Perizinan for range 2025 to 26 Mar 2026...");
+        $this->command->info("Generating Perizinan for year $year...");
 
         $batchSize = 500;
         $dataToInsert = [];

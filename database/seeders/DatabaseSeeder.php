@@ -18,12 +18,9 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('gudang_senjata')->truncate();
         DB::table('perizinan_kendaraan')->truncate();
-        DB::table('perizinan')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $this->call([
-            RoleSeeder::class,
-            UserSeeder::class,
             GudangSenjataSeeder::class,
             
             // Standard Perizinan (Kijang, etc)
@@ -38,9 +35,6 @@ class DatabaseSeeder extends Seeder
             PerizinanKendaraanQ2EkstraSeeder::class,
             PerizinanKendaraanQ3EkstraSeeder::class,
             PerizinanKendaraanQ4EkstraSeeder::class,
-            
-            // Perizinan (Pribadi/Dinas)
-            PerizinanSeeder::class,
         ]);
     }
 }

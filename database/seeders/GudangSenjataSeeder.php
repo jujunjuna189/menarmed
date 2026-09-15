@@ -34,7 +34,7 @@ class GudangSenjataSeeder extends Seeder
         }
 
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate = Carbon::create(2026, 3, 26);
+        $endDate = Carbon::create(2026, 3, 18);
         
         $dataToInsert = [];
         $batchSize = 500;
