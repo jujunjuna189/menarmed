@@ -20,15 +20,15 @@ class MonthlyAbsensiExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return array_merge(['Nama', 'Pangkat'], range(1, $this->month->daysInMonth));
+        return array_merge(['No.', 'Nama', 'Pangkat'], range(1, $this->month->daysInMonth));
     }
 
     public function collection()
     {
         $people = MonthlyAttendance::people($this->search)->get();
         $records = MonthlyAttendance::records($this->month, $people->pluck('id'));
-        return $people->map(function ($person) use ($records) {
-            $row = [$person->name, $person->pangkat ?: '-'];
+        return $people->values()->map(function ($person, $index) use ($records) {
+            $row = [$index + 1, $person->name, $person->pangkat ?: '-'];
             for ($day = 1; $day <= $this->month->daysInMonth; $day++) {
                 $items = $records->get($person->id . ':' . $day, collect());
                 $row[] = $items->map(function ($record) { return MonthlyAttendance::code($record->ket); })->unique()->implode('/') ?: '-';

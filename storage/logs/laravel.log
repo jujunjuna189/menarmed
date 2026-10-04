@@ -2990,3 +2990,146 @@ DST Off\">2024-02-01 00:00:00.0 Asia/Jakarta (+07:00)</span>
 [2026-10-04 14:23:38] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/pengaturan","method":"GET","auth_check":true,"auth_id":1,"auth_email":"admin","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-04 14:24:31] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/absensi","method":"GET","auth_check":true,"auth_id":1,"auth_email":"admin","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-04 14:34:15] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/absensi","method":"GET","auth_check":true,"auth_id":1,"auth_email":"admin","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-04 15:15:26] local.ERROR: SQLSTATE[HY000] [2002] Operation not permitted (SQL: select * from information_schema.tables where table_schema = menarmed and table_name = migrations and table_type = 'BASE TABLE') {"exception":"[object] (Illuminate\\Database\\QueryException(code: 2002): SQLSTATE[HY000] [2002] Operation not permitted (SQL: select * from information_schema.tables where table_schema = menarmed and table_name = migrations and table_type = 'BASE TABLE') at /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php:712)
+[stacktrace]
+#0 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(672): Illuminate\\Database\\Connection->runQueryCallback('select * from i...', Array, Object(Closure))
+#1 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(376): Illuminate\\Database\\Connection->run('select * from i...', Array, Object(Closure))
+#2 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Schema/MySqlBuilder.php(44): Illuminate\\Database\\Connection->select('select * from i...', Array)
+#3 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Migrations/DatabaseMigrationRepository.php(169): Illuminate\\Database\\Schema\\MySqlBuilder->hasTable('migrations')
+#4 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(673): Illuminate\\Database\\Migrations\\DatabaseMigrationRepository->repositoryExists()
+#5 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/StatusCommand.php(53): Illuminate\\Database\\Migrations\\Migrator->repositoryExists()
+#6 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(606): Illuminate\\Database\\Console\\Migrations\\StatusCommand->Illuminate\\Database\\Console\\Migrations\\{closure}()
+#7 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/StatusCommand.php(68): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
+#8 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\StatusCommand->handle()
+#9 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Util.php(40): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#10 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#11 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(37): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#12 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Container.php(653): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#13 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(136): Illuminate\\Container\\Container->call(Array)
+#14 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Command/Command.php(298): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#15 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(121): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#16 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(1024): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(299): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\StatusCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#21 /Users/user/Documents/quict/menarmed/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#22 {main}
+
+[previous exception] [object] (PDOException(code: 2002): SQLSTATE[HY000] [2002] Operation not permitted at /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:70)
+[stacktrace]
+#0 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(70): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(46): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=127....', 'root', '', Array)
+#2 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#4 [internal function]: Illuminate\\Database\\Connectors\\ConnectionFactory->Illuminate\\Database\\Connectors\\{closure}()
+#5 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1064): call_user_func(Object(Closure))
+#6 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1100): Illuminate\\Database\\Connection->getPdo()
+#7 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(442): Illuminate\\Database\\Connection->getReadPdo()
+#8 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(368): Illuminate\\Database\\Connection->getPdoForSelect(true)
+#9 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(705): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('select * from i...', Array)
+#10 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(672): Illuminate\\Database\\Connection->runQueryCallback('select * from i...', Array, Object(Closure))
+#11 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php(376): Illuminate\\Database\\Connection->run('select * from i...', Array, Object(Closure))
+#12 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Schema/MySqlBuilder.php(44): Illuminate\\Database\\Connection->select('select * from i...', Array)
+#13 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Migrations/DatabaseMigrationRepository.php(169): Illuminate\\Database\\Schema\\MySqlBuilder->hasTable('migrations')
+#14 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(673): Illuminate\\Database\\Migrations\\DatabaseMigrationRepository->repositoryExists()
+#15 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/StatusCommand.php(53): Illuminate\\Database\\Migrations\\Migrator->repositoryExists()
+#16 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php(606): Illuminate\\Database\\Console\\Migrations\\StatusCommand->Illuminate\\Database\\Console\\Migrations\\{closure}()
+#17 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/StatusCommand.php(68): Illuminate\\Database\\Migrations\\Migrator->usingConnection(NULL, Object(Closure))
+#18 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Database\\Console\\Migrations\\StatusCommand->handle()
+#19 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Util.php(40): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#20 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#21 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(37): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#22 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Container.php(653): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#23 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(136): Illuminate\\Container\\Container->call(Array)
+#24 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Command/Command.php(298): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#25 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(121): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#26 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(1024): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#27 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(299): Symfony\\Component\\Console\\Application->doRunCommand(Object(Illuminate\\Database\\Console\\Migrations\\StatusCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#28 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#29 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#30 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#31 /Users/user/Documents/quict/menarmed/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#32 {main}
+"} 
+[2026-10-04 15:16:17] local.ERROR: PHP Parse error: Syntax error, unexpected '=' on line 1 {"exception":"[object] (Psy\\Exception\\ParseErrorException(code: 0): PHP Parse error: Syntax error, unexpected '=' on line 1 at /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Exception/ParseErrorException.php:40)
+[stacktrace]
+#0 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/CodeCleaner.php(340): Psy\\Exception\\ParseErrorException::fromParseError(Object(PhpParser\\Error))
+#1 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/CodeCleaner.php(267): Psy\\CodeCleaner->parse('<?php  = ['2022...', false)
+#2 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Shell.php(854): Psy\\CodeCleaner->clean(Array, false)
+#3 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Shell.php(883): Psy\\Shell->addCode(' = ['2022_09_25...', true)
+#4 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Shell.php(1266): Psy\\Shell->setCode(' = ['2022_09_25...', true)
+#5 /Users/user/Documents/quict/menarmed/vendor/laravel/tinker/src/Console/TinkerCommand.php(72): Psy\\Shell->execute(' = ['2022_09_25...')
+#6 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#7 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Util.php(40): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#8 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#9 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(37): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#10 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Container.php(653): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#11 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(136): Illuminate\\Container\\Container->call(Array)
+#12 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Command/Command.php(298): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#13 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(121): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#14 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(1024): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#15 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(299): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#16 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 /Users/user/Documents/quict/menarmed/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 {main}
+"} 
+[2026-10-04 15:24:06] local.ERROR: Writing to /Users/user/.config/psysh/psysh_history is not allowed. {"exception":"[object] (ErrorException(code: 0): Writing to /Users/user/.config/psysh/psysh_history is not allowed. at /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/ConfigPaths.php:386)
+[stacktrace]
+#0 [internal function]: Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(1024, 'Writing to /Use...', '/Users/user/Doc...', 386, Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/ConfigPaths.php(386): trigger_error('Writing to /Use...', 1024)
+#2 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Configuration.php(631): Psy\\ConfigPaths::touchFileWithMkdir('/Users/user/.co...')
+#3 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Configuration.php(656): Psy\\Configuration->setHistoryFile('/Users/user/.co...')
+#4 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Configuration.php(796): Psy\\Configuration->getHistoryFile()
+#5 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Shell.php(92): Psy\\Configuration->getReadline()
+#6 /Users/user/Documents/quict/menarmed/vendor/laravel/tinker/src/Console/TinkerCommand.php(55): Psy\\Shell->__construct(Object(Psy\\Configuration))
+#7 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#8 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Util.php(40): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#9 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#10 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(37): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#11 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Container.php(653): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#12 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(136): Illuminate\\Container\\Container->call(Array)
+#13 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Command/Command.php(298): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#14 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(121): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#15 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(1024): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#16 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(299): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 /Users/user/Documents/quict/menarmed/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#21 {main}
+"} 
+[2026-10-04 15:24:11] local.ERROR: Uncaught PDOException: SQLSTATE[HY000] [2002] Operation not permitted in /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:70
+Stack trace:
+#0 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(70): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(46): Illuminate\Database\Connectors\Connector->createPdoConnection('mysql:host=127....', 'root', '', Array)
+#2 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\Database\Connectors\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\Database\Connectors\MySqlConnector->connect(Array)
+#4 [internal fun {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[HY000] [2002] Operation not permitted in /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:70
+Stack trace:
+#0 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(70): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(46): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=127....', 'root', '', Array)
+#2 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#4 [internal fun at /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php:712)
+[stacktrace]
+#0 {main}
+"} 
+[2026-10-04 15:25:28] local.ERROR: Uncaught Error: Call to protected method Illuminate\Database\Migrations\Migrator::resolvePath() from context '' in Command line code:1
+Stack trace:
+#0 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught Error: Call to protected method Illuminate\\Database\\Migrations\\Migrator::resolvePath() from context '' in Command line code:1
+Stack trace:
+#0 {main}
+  thrown at Command line code:1)
+[stacktrace]
+#0 {main}
+"} 
+[2026-10-04 15:56:41] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-04 15:56:48] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/absensi","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-04 15:56:49] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/absensi/pdf?filter%5Bname%5D=&month=2026-10","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-04 15:57:23] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/absensi/export?filter%5Bname%5D=&month=2026-10","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-04 16:01:53] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/absensi","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-04 16:01:55] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/absensi/export?filter%5Bname%5D=&month=2026-10","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
