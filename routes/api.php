@@ -44,8 +44,10 @@ Route::post('/perizinan/ranpur/store', [App\Http\Controllers\Api\Perizinan\Periz
 Route::post('/perizinan/kendaraan/show', [App\Http\Controllers\Api\Perizinan\PerizinanKendaraanController::class, 'show']);
 Route::post('/perizinan/kendaraan/store', [App\Http\Controllers\Api\Perizinan\PerizinanKendaraanController::class, 'store']);
 // Gudang Senjata
+Route::post('/gudang_senjata/show', [App\Http\Controllers\Api\GudangSenjata\GudangSenjataController::class, 'show']);
 Route::post('/gudang_senjata/store', [App\Http\Controllers\Api\GudangSenjata\GudangSenjataController::class, 'store']);
 // Logistik
+Route::post('/logistik/show', [App\Http\Controllers\Api\Logistik\LogistikController::class, 'show']);
 Route::post('/logistik/store', [App\Http\Controllers\Api\Logistik\LogistikController::class, 'store']);
 // Staff
 Route::post('/staff/show', [App\Http\Controllers\Api\Staff\StaffController::class, 'show']);

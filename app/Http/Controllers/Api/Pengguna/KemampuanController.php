@@ -37,9 +37,9 @@ class KemampuanController extends Controller
                 ], 200);
             } else {
                 return response()->json([
-                    'status' => 'Failed',
+                    'status' => 'Success',
                     'data' => [],
-                ], 300);
+                ], 200);
             }
         } catch (Exception $e) {
             return response()->json([

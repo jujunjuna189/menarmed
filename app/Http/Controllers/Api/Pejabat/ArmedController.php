@@ -38,10 +38,32 @@ class ArmedController extends Controller
         return $validate;
     }
 
-    public function show()
+    public function show(Request $request)
     {
         try {
-            $response = ArmedModel::orderBy('created_at', 'desc')->get();
+            $query = ArmedModel::orderBy('created_at', 'desc')->orderBy('id', 'desc');
+            $search = trim((string) $request->input('search', ''));
+            if ($search !== '') {
+                $query->where(function ($query) use ($search) {
+                    $query->where('nama', 'like', '%' . $search . '%')
+                        ->orWhere('jabatan', 'like', '%' . $search . '%');
+                });
+            }
+            $pagination = null;
+            if ($request->has('page')) {
+                $page = max(1, (int) $request->input('page', 1));
+                $perPage = min(100, max(1, (int) $request->input('per_page', 10)));
+                $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+                $response = $paginator->getCollection();
+                $pagination = [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'total' => $paginator->total(),
+                    'has_more' => $paginator->hasMorePages(),
+                ];
+            } else {
+                $response = $query->get();
+            }
             foreach ($response as $val) {
                 $val['lates'] = !empty($val->created_at) && Carbon::parse($val->created_at)->addDays(2) > Carbon::now() ? 'Baru' : null;
             }
@@ -50,6 +72,7 @@ class ArmedController extends Controller
                 return response()->json([
                     'status' => 'Success',
                     'data' => $response,
+                    'pagination' => $pagination,
                 ], 200);
             } else {
                 return response()->json([

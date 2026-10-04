@@ -34,6 +34,16 @@
         .article-preview { max-width: none; padding: 0; }
         .article-preview-toolbar, .article-preview-content iframe { display: none; }
     }
+    @if(request()->boolean('mobile'))
+    .article-preview { max-width: 720px; padding: 20px 18px 40px; color: #24272b; }
+    .article-preview-toolbar { display: none; }
+    .article-preview-title { font-size: 23px; line-height: 1.4; margin: 8px 0 12px; }
+    .article-preview-description { font-size: 14px; line-height: 1.65; color: #73777d; margin-bottom: 20px; }
+    .article-preview-content { font-size: 15px; line-height: 1.8; }
+    .article-preview-content p { margin-bottom: 16px; }
+    .article-preview-content h2 { font-size: 20px; }
+    .article-preview-content h3 { font-size: 18px; }
+    @endif
 </style>
 <main class="article-preview">
     <div class="article-preview-toolbar">

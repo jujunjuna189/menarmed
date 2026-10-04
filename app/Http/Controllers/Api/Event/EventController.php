@@ -15,10 +15,18 @@ class EventController extends Controller
     {
         try {
             $validated = $request->validate([
-                'tanggal' => ['required', 'date_format:Y-m-d'],
+                'tanggal' => ['required_without:date_from', 'date_format:Y-m-d'],
+                'date_from' => ['required_without:tanggal', 'date_format:Y-m-d'],
+                'date_to' => ['required_with:date_from', 'date_format:Y-m-d', 'after_or_equal:date_from'],
             ]);
 
-            $event = EventModel::where('tanggal', $validated['tanggal'])
+            $query = EventModel::query();
+            if (isset($validated['date_from'])) {
+                $query->whereBetween('tanggal', [$validated['date_from'], $validated['date_to']]);
+            } else {
+                $query->where('tanggal', $validated['tanggal']);
+            }
+            $event = $query
                 ->orderBy('id')
                 ->get();
 
