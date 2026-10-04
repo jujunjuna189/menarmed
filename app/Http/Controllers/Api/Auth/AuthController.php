@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,55 +11,53 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        try {
-            $where['email'] = $request->email;
-            $result = User::where($where)->first();
+        $credentials = $request->validate([
+            'email' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
 
-            if (Hash::check($request->password, $result->password, [])) {
-                return response()->json([
-                    'status' => 'Success',
-                    'data' => [$result],
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 'Failed',
-                    'data' => [],
-                ], 300);
-            }
-        } catch (Exception $e) {
+        $user = User::where('email', trim($credentials['email']))->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
-                'status' => 'Server Error',
+                'status' => 'Failed',
+                'message' => 'NRP atau password tidak sesuai.',
                 'data' => [],
-            ], 500);
+            ], 401);
         }
+
+        $user->tokens()->where('name', 'menarmed-mobile')->delete();
+        $token = $user->createToken('menarmed-mobile')->plainTextToken;
+
+        return response()->json([
+            'status' => 'Success',
+            'message' => 'Berhasil masuk.',
+            'data' => [$user],
+            'token' => $token,
+        ]);
     }
 
     public function register(Request $request)
     {
-        try {
-            $data['name'] = $request->name;
-            $data['email'] = $request->email;
-            $data['password'] = Hash::make($request->password);
-            $data['role'] = 3;
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+        ]);
 
-            $register = User::create($data);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => trim($validated['email']),
+            'password' => Hash::make($validated['password']),
+            'role' => 3,
+        ]);
+        $token = $user->createToken('menarmed-mobile')->plainTextToken;
 
-            if ($register) {
-                return response()->json([
-                    'status' => 'Success',
-                    'data' => [$register],
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 'Failed',
-                    'data' => [],
-                ], 300);
-            }
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'Server Error',
-                'data' => [],
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'Success',
+            'message' => 'Akun berhasil dibuat.',
+            'data' => [$user],
+            'token' => $token,
+        ], 201);
     }
 }

@@ -1,62 +1,44 @@
 @extends('layouts.app_template')
 @section('content')
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Rekap Data Logistik</h3>
+<style>
+    .permission-page .btn, .permission-modal .btn { box-shadow: none !important; }
+    .permission-page .table td { padding-top: 10px; padding-bottom: 10px; }
+    .permission-purpose { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    .permission-action { width: 30px; height: 30px; padding: 0; border: 0; background: transparent; }
+    .permission-menu { position: fixed !important; z-index: 1050; border: 1px solid #dce1e7; box-shadow: none; }
+</style>
+<div class="permission-page">
+    <div class="d-flex flex-column gap-3 mb-3">
+        <h2 class="page-title mb-0">Rekap Logistik</h2>
+        <form action="{{ route('report.logistik') }}" method="GET" class="d-flex flex-wrap align-items-end gap-2">
+            <div><label for="permission-start" class="form-label small">Dari</label><input id="permission-start" type="date" name="start_date" class="form-control" value="{{ $start_date }}" onchange="this.form.requestSubmit()"></div>
+            <div><label for="permission-end" class="form-label small">Sampai</label><input id="permission-end" type="date" name="end_date" class="form-control" value="{{ $end_date }}" onchange="this.form.requestSubmit()"></div>
+            <div class="input-icon">
+                <span class="input-icon-addon"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m21 21-6-6"/></svg></span>
+                <input type="search" name="filter[name]" class="form-control" placeholder="Cari personel" value="{{ $search_name }}" aria-label="Cari personel">
             </div>
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-            <div class="card-body border-bottom py-3">
-                <form action="{{ route('report.logistik') }}" method="GET" class="d-flex w-100" id="filterForm">
-                    <div class="text-muted">
-                        Show
-                        <div class="mx-2 d-inline-block">
-                            <select name="page[size]" class="form-select form-select-sm" onchange="this.form.submit()">
-                                <option value="10" {{ $page_size == 10 ? 'selected' : '' }}>10</option>
-                                <option value="25" {{ $page_size == 25 ? 'selected' : '' }}>25</option>
-                                <option value="50" {{ $page_size == 50 ? 'selected' : '' }}>50</option>
-                                <option value="100" {{ $page_size == 100 ? 'selected' : '' }}>100</option>
-                            </select>
-                        </div>
-                        entries
-                    </div>
-                    <div class="ms-3 d-flex align-items-center">
-                        <label class="form-label mb-0 me-2">Dari:</label>
-                        <input type="date" name="start_date" class="form-control form-control-sm me-2" value="{{ $start_date }}" onchange="this.form.submit()">
-                        <label class="form-label mb-0 me-2">Sampai:</label>
-                        <input type="date" name="end_date" class="form-control form-control-sm me-2" value="{{ $end_date }}" onchange="this.form.submit()">
-                    </div>
-                    <div class="ms-auto text-muted d-flex">
-                        <div class="me-2 d-inline-block">
-                            <input type="text" name="filter[name]" class="form-control form-control-sm" placeholder="Search Nama..." value="{{ $search_name }}">
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-sm ms-1">Cari</button>
-                        <a href="{{ route('report.logistik.export', request()->all()) }}" class="btn btn-success btn-sm ms-2">
-                            Export Excel
-                        </a>
-                        <a href="{{ route('report.logistik.pdf', request()->all()) }}" class="btn btn-danger btn-sm ms-2">
-                            Export PDF
-                        </a>
-                    </div>
-                </form>
-            </div>
+            <select name="page[size]" class="form-select w-auto" onchange="this.form.requestSubmit()" aria-label="Jumlah data">
+                @foreach([10, 25, 50, 100] as $size)
+                    <option value="{{ $size }}" {{ (int) $page_size === $size ? 'selected' : '' }}>{{ $size }} data</option>
+                @endforeach
+            </select>
+            <a href="{{ route('report.logistik.export', ['start_date' => $start_date, 'end_date' => $end_date, 'filter' => ['name' => $search_name]]) }}" class="btn btn-outline-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/></svg>Excel
+            </a>
+            <a href="{{ route('report.logistik.pdf', ['start_date' => $start_date, 'end_date' => $end_date, 'filter' => ['name' => $search_name]]) }}" class="btn btn-outline-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7m-7 4h7"/></svg>PDF
+            </a>
+        </form>
+    </div>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    <div class="card">
             <div class="table-responsive">
                 <table class="table card-table table-vcenter text-nowrap datatable">
                     <thead>
                         <tr>
-                            <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
-                            <th class="w-1">No.
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-dark icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <polyline points="6 15 12 9 18 15"></polyline>
-                                </svg>
-                            </th>
+                            <th class="w-1">No.</th>
                             <th>Nama</th>
                             <th>Waktu Keluar</th>
                             <th>Waktu Masuk</th>
@@ -64,22 +46,67 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($report as $key => $val)
+                        @forelse($report as $key => $val)
                         <tr>
-                            <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
                             <td>{{ $report->firstItem() + $key }}</td>
                             <td>{{ $val->userModel->name ?? '-' }}</td>
                             <td>{{ $val->keluar != null ? Carbon\Carbon::make($val->keluar)->format('d/m/Y H:i:s') : '-' }}</td>
                             <td>{{ $val->masuk != null ? Carbon\Carbon::make($val->masuk)->format('d/m/Y H:i:s') : '-' }}</td>
                             <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modal-edit-{{ $val->id }}">
-                                    Edit
-                                </button>
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-icon permission-action" data-bs-toggle="dropdown" aria-expanded="false" title="Aksi logistik" aria-label="Aksi logistik">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end permission-menu">
+                                        <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-edit-{{ $val->id }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/></svg>Edit
+                                        </button>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
 
+                        @empty
+                        <tr><td colspan="5" class="text-center text-muted py-4">Data logistik tidak ditemukan.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+                <p class="m-0 text-muted">Menampilkan <span>{{$report->firstItem() ?? 0}}</span> sampai <span>{{$report->lastItem() ?? 0}}</span> dari <span>{{$report->total()}}</span> data</p>
+                <ul class="pagination m-0 ms-auto">
+                    <li class="page-item {{ $report->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{$controller->prevPagination($report->currentPage(), 'report.logistik', request()->all())->link}}">
+                            <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <polyline points="15 6 9 12 15 18"></polyline>
+                            </svg>
+                            Sebelumnya
+                        </a>
+                    </li>
+                    @foreach($controller->counterPagination($report->lastPage(), $report->currentPage(), 'report.logistik', request()->all()) as $val)
+                    <li class="page-item {{$val->is_active ? 'active' : ''}}"><a class="page-link" href="{{$val->link}}">{{$val->lable}}</a></li>
+                    @endforeach
+                    <li class="page-item {{ $report->hasMorePages() ? '' : 'disabled' }}">
+                        <a class="page-link" href="{{$controller->nextPagination($report->currentPage(), $report->lastPage(), 'report.logistik', request()->all())->link}}">
+                            Berikutnya
+                            <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <polyline points="9 6 15 12 9 18"></polyline>
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+    </div>
+</div>
+@endsection
+@section('modal')
+@foreach($report as $val)
                         <!-- Modal Edit -->
-                        <div class="modal modal-blur fade" id="modal-edit-{{ $val->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal fade permission-modal" id="modal-edit-{{ $val->id }}" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <form action="{{ route('report.logistik.update', $val->id) }}" method="POST">
@@ -110,44 +137,28 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+                                            <button type="button" class="btn btn-outline-secondary me-auto" data-bs-dismiss="modal">Batal</button>
                                             <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-footer d-flex align-items-center">
-                <p class="m-0 text-muted">Showing <span>{{$report->firstItem() ?? 0}}</span> to <span>{{$report->lastItem() ?? 0}}</span> of <span>{{$report->total()}}</span> entries</p>
-                <ul class="pagination m-0 ms-auto">
-                    <li class="page-item {{ $report->onFirstPage() ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{$controller->prevPagination($report->currentPage(), 'report.logistik', request()->all())->link}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <polyline points="15 6 9 12 15 18"></polyline>
-                            </svg>
-                            prev
-                        </a>
-                    </li>
-                    @foreach($controller->counterPagination($report->lastPage(), $report->currentPage(), 'report.logistik', request()->all()) as $p)
-                    <li class="page-item {{$p->is_active ? 'active' : ''}}"><a class="page-link" href="{{$p->link}}">{{$p->lable}}</a></li>
-                    @endforeach
-                    <li class="page-item {{ $report->hasMorePages() ? '' : 'disabled' }}">
-                        <a class="page-link" href="{{$controller->nextPagination($report->currentPage(), $report->lastPage(), 'report.logistik', request()->all())->link}}">
-                            next
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <polyline points="9 6 15 12 9 18"></polyline>
-                            </svg>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+@endforeach
 @endsection
+@push('script')
+<script>
+document.querySelectorAll('.permission-action').forEach(button => {
+    const menu = button.nextElementSibling;
+    button.addEventListener('shown.bs.dropdown', () => {
+        document.body.appendChild(menu);
+        const bounds = button.getBoundingClientRect();
+        menu.style.setProperty('transform', 'none');
+        menu.style.setProperty('inset', 'auto');
+        menu.style.left = Math.max(8, bounds.right - menu.offsetWidth) + 'px';
+        menu.style.top = Math.max(8, bounds.bottom + menu.offsetHeight + 4 > innerHeight ? bounds.top - menu.offsetHeight - 4 : bounds.bottom + 4) + 'px';
+    });
+    button.addEventListener('hidden.bs.dropdown', () => { button.parentElement.appendChild(menu); menu.removeAttribute('style'); });
+});
+</script>
+@endpush

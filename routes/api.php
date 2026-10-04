@@ -61,11 +61,12 @@ Route::post('/kostrad/update', [App\Http\Controllers\Api\Pejabat\KostradControll
 Route::post('/kostrad/delete', [App\Http\Controllers\Api\Pejabat\KostradController::class, 'delete']);
 // Event
 Route::post('/event/show', [App\Http\Controllers\Api\Event\EventController::class, 'show']);
-Route::post('/event/store', [App\Http\Controllers\Api\Event\EventController::class, 'store']);
-Route::post('/event/delete', [App\Http\Controllers\Api\Event\EventController::class, 'delete']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/event/store', [App\Http\Controllers\Api\Event\EventController::class, 'store']);
+    Route::post('/event/delete', [App\Http\Controllers\Api\Event\EventController::class, 'delete']);
+});
 // Artikel
 Route::post('/artikel/show', [App\Http\Controllers\Api\Artikel\ArtikelController::class, 'show']);
-Route::post('/artikel/store', [App\Http\Controllers\Api\Artikel\ArtikelController::class, 'store']);
 // E-Learning
 Route::post('/e-learning/show', [App\Http\Controllers\Api\ELearning\ELearningController::class, 'show']);
 Route::post('/e-learning/store', [App\Http\Controllers\Api\ELearning\ELearningController::class, 'store']);

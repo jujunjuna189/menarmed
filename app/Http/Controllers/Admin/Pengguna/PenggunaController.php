@@ -21,7 +21,7 @@ class PenggunaController extends Controller
                 $column['kemampuan'] = false;
                 $column['aksi'] = true;
                 break;
-            case 3: // Personil
+            case 3: // Personel
                 $column['kemampuan'] = true;
                 $column['aksi'] = true;
                 break;
@@ -42,16 +42,26 @@ class PenggunaController extends Controller
     public function index(Request $request)
     {
         $role_key = $request->key;
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
+        $sort = $request->input('sort', 'name');
+        $sort = in_array($sort, ['name', '-name', 'email', '-email'], true) ? $sort : 'name';
+
         $pengguna = QueryBuilder::for(User::class)
             ->where('role', $role_key)
-            ->orderBy('name', 'asc')
+            ->orderBy(ltrim($sort, '-'), strpos($sort, '-') === 0 ? 'desc' : 'asc')
+            ->orderBy('id', 'asc')
             ->allowedFilters('name')
-            ->get();
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))
+            ->appends($request->input());
 
         $data['pengguna'] = $pengguna;
         $data['role'] = \App\Models\RoleModel::where('key', $role_key)->first();
         $data['table'] = $this->tableSetting($role_key);
-        $data['no'] = 1;
+        $data['controller'] = $this;
+        $data['page_size'] = $pageSize;
+        $data['search_name'] = $request->input('filter.name', '');
+        $data['sort'] = $sort;
 
         return view('pengguna.index', $data);
     }
@@ -88,7 +98,7 @@ class PenggunaController extends Controller
      */
     public function view(Request $request)
     {
-        $data['user'] = User::find($request->user_id);
+        $data['user'] = User::findOrFail($request->user_id);
 
         return view('pengguna.view', $data);
     }
@@ -98,6 +108,10 @@ class PenggunaController extends Controller
      */
     public function updateRole(Request $request)
     {
+        $request->validate(['id' => ['required', 'integer', 'exists:users,id'], 'role' => ['required', 'integer', 'in:1,3']]);
+        if ((int) $request->id === (int) auth()->id() && (int) $request->role !== 1) {
+            return response()->json(['message' => 'Anda tidak dapat mencabut akses admin sendiri.'], 422);
+        }
         $authUser = auth()->user();
 
         Log::info('Masuk update role', [
@@ -132,6 +146,52 @@ class PenggunaController extends Controller
             "message" => "Berhasil mengubah user",
             "data" => $pengguna,
         ]);
+    }
+
+    public function updateAdmin(Request $request, User $user)
+    {
+        abort_unless((int) $user->role === 1, 404);
+        return $this->updateAccount($request, $user);
+    }
+
+    public function updatePersonel(Request $request, User $user)
+    {
+        abort_unless((int) $user->role === 3, 404);
+        return $this->updateAccount($request, $user);
+    }
+
+    private function updateAccount(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+        if (!empty($data['password'])) {
+            $data['password'] = \Illuminate\Support\Facades\Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+        $user->update($data);
+
+        return response()->json(['status' => 'success', 'message' => 'Pengguna berhasil diperbarui.']);
+    }
+
+    public function destroyPersonel(User $user)
+    {
+        abort_unless((int) $user->role === 3, 404);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
+            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            foreach (['absensi', 'perizinan', 'perizinan_kendaraan', 'perizinan_ranpur', 'logistik', 'gudang_senjata'] as $table) {
+                if (\Illuminate\Support\Facades\DB::table($table)->where('user_id', $user->id)->exists()) {
+                    return response()->json(['message' => 'Personel memiliki riwayat operasional dan tidak dapat dihapus.'], 422);
+                }
+            }
+            $user->tokens()->delete();
+            \App\Models\KemampuanModel::where('user_id', $user->id)->delete();
+            $user->delete();
+            return response()->json(['status' => 'success', 'message' => 'Personel berhasil dihapus.']);
+        });
     }
 
     /**

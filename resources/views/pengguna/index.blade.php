@@ -1,125 +1,171 @@
 @extends('layouts.app_template')
 @section('content')
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header justify-content-between">
-                <h3 class="card-title">{{ $role->role }}</h3>
-                <div>
-                    @if($role->role == 'Admin')
-                    <span class="btn bg-blue-lt border-dashed" onclick="openModalUser()">Tambah Admin</span>
-                    @else
-                    <a href="{{ route('pengguna.template') }}" class="btn bg-green-lt border-dashed">
-                        Download Format
-                    </a>
-                    <span class="btn bg-orange-lt border-dashed" onclick="openModalImport()">
-                        Import Excel
-                    </span>
-                    @endif
+<style>
+    .users-page .btn, #modal-user .btn, #modal-edit-admin .btn, #modal-import .btn { box-shadow: none !important; }
+    .admin-action { width: 30px; height: 30px; padding: 0; border: 0; background: transparent; }
+    .admin-menu { position: fixed !important; z-index: 1050; box-shadow: none; border: 1px solid #dce1e7; }
+    .users-page .table td { padding-top: 10px; padding-bottom: 10px; }
+    .users-controls .input-icon { width: 240px; }
+    @media (max-width: 575.98px) {
+        .users-controls, .users-controls form { width: 100%; }
+        .users-controls .input-icon { flex: 1; width: auto; min-width: 0; }
+    }
+</style>
+<div class="users-page">
+    <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-2 mb-3">
+        <h2 class="page-title mb-0">{{ $role->role }}</h2>
+        <div class="users-controls d-flex flex-wrap align-items-center gap-2">
+            <form action="{{ route('pengguna') }}" method="GET" class="d-flex flex-wrap gap-2">
+                <input type="hidden" name="key" value="{{ $role->key }}">
+                <div class="input-icon">
+                    <span class="input-icon-addon"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m21 21-6-6"/></svg></span>
+                    <input type="search" name="filter[name]" value="{{ $search_name }}" class="form-control" placeholder="Cari nama pengguna" aria-label="Cari nama pengguna">
                 </div>
-            </div>
-            <div class="card-body border-bottom py-3">
-                <div class="d-flex">
-                    <div class="text-muted">
-                        Show
-                        <div class="mx-2 d-inline-block">
-                            <input type="text" class="form-control form-control-sm" value="8" size="3" aria-label="Invoices count">
-                        </div>
-                        entries
-                    </div>
-                    <div class="ms-auto text-muted">
-                        Search:
-                        <div class="ms-2 d-inline-block">
-                            <form action="javascript:onSearch()" method="get">
-                                <input type="text" name="search" class="form-control form-control-sm" aria-label="Search invoice">
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <select name="sort" class="form-select w-auto" onchange="this.form.requestSubmit()" aria-label="Urutan pengguna">
+                    @foreach(['name' => 'Nama A-Z', '-name' => 'Nama Z-A', 'email' => 'Username A-Z', '-email' => 'Username Z-A'] as $value => $label)
+                        <option value="{{ $value }}" {{ $sort === $value ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <select name="page[size]" class="form-select w-auto" onchange="this.form.requestSubmit()" aria-label="Jumlah data per halaman">
+                    @foreach([10, 25, 50, 100] as $size)
+                        <option value="{{ $size }}" {{ $page_size === $size ? 'selected' : '' }}>{{ $size }} data</option>
+                    @endforeach
+                </select>
+            </form>
+            @if((int) $role->key === 1)
+                <button type="button" class="btn btn-primary" onclick="openModalUser()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                    Tambah Admin
+                </button>
+            @else
+                <a href="{{ route('pengguna.template') }}" class="btn btn-outline-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/></svg>
+                    Format Excel
+                </a>
+                <button type="button" class="btn btn-primary" onclick="openModalImport()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M5 17v4h14v-4"/></svg>
+                    Import Excel
+                </button>
+            @endif
+        </div>
+    </div>
+    <div class="card">
             <div class="table-responsive">
                 <table class="table card-table table-vcenter text-nowrap datatable">
                     <thead>
                         <tr>
-                            <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
-                            <th class="w-1">No.
-                                <!-- Download SVG icon from http://tabler-icons.io/i/chevron-up -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-dark icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <polyline points="6 15 12 9 18 15"></polyline>
-                                </svg>
-                            </th>
+                            <th class="w-1">No.</th>
                             <th>Nama</th>
                             <th>Username</th>
                             @if($table->kemampuan)
                             <th>Kemampuan</th>
                             @endif
                             @if($table->aksi)
-                            <th style="width: 10rem;" class="bg-dark text-center">Aksi</th>
+                            <th style="width: 64px;" class="text-center">Aksi</th>
                             @endif
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($pengguna as $val)
+                        @forelse($pengguna as $key => $val)
                         <tr>
-                            <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                            <td>{{ $no++ }}</td>
+                            <td>{{ $pengguna->firstItem() + $key }}</td>
                             <td>{{ $val->name ?? '-' }}</td>
                             <td>{{ $val->email }}</td>
                             @if($table->kemampuan)
-                            <th>@if(empty($val->kemampuanModel)) <span class="badge bg-red-lt">Belum ada data</span> @else <span class="badge bg-success-lt">Tersedia</span> @endif</th>
+                            <td>@if(empty($val->kemampuanModel)) <span class="badge bg-red-lt">Belum ada data</span> @else <span class="badge bg-success-lt">Tersedia</span> @endif</td>
                             @endif
-                            @if($table->aksi && $role->id != 1)
+                            @if($table->aksi && (int) $role->key !== 1)
                             <td class="text-center">
-                                <a href="{{ route('pengguna.view', ['user_id' => $val->id]) }}" class="btn btn-icon border-dashed" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Lihat">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-icon admin-action" data-bs-toggle="dropdown" aria-expanded="false" title="Aksi personel" aria-label="Aksi personel {{ $val->name }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end admin-menu">
+                                <a href="{{ route('pengguna.view', ['user_id' => $val->id]) }}" class="dropdown-item">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                         <circle cx="12" cy="12" r="2"></circle>
                                         <path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7"></path>
                                     </svg>
+                                    Lihat Profil
                                 </a>
+                                        <a href="{{ route('pengguna.view', ['user_id' => $val->id, 'kemampuan' => 1]) }}" class="dropdown-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                @if($val->kemampuanModel)
+                                                    <path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/>
+                                                @else
+                                                    <path d="M12 5v14M5 12h14"/>
+                                                @endif
+                                            </svg>
+                                            {{ $val->kemampuanModel ? 'Edit Kemampuan' : 'Tambah Kemampuan' }}
+                                        </a>
+                                        <button type="button" class="dropdown-item edit-admin" data-url="{{ route('pengguna.personel.update', $val->id) }}" data-name="{{ $val->name }}" data-email="{{ $val->email }}" data-kind="Personel">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/></svg>
+                                            Edit
+                                        </button>
+                                        <div class="dropdown-divider"></div>
+                                        <button type="button" class="dropdown-item text-danger delete-personnel" data-url="{{ route('pengguna.personel.destroy', $val->id) }}" data-name="{{ $val->name }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6m4-6v6"/></svg>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </td>
                             @endif
-                            @if($table->aksi && $role->id == 1)
+                            @if($table->aksi && (int) $role->key === 1)
                             <td class="text-center">
-                                <span class="btn btn-icon bg-red-lt border-dashed" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Lihat" onclick="deletePejabat(<?= $val->id ?>)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M4 7l16 0" />
-                                        <path d="M10 11l0 6" />
-                                        <path d="M14 11l0 6" />
-                                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                    </svg>
-                                </span>
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-icon admin-action" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Aksi admin {{ $val->name }}" title="Aksi admin">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end admin-menu">
+                                        <button type="button" class="dropdown-item edit-admin" data-url="{{ route('pengguna.admin.update', $val->id) }}" data-name="{{ $val->name }}" data-email="{{ $val->email }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/></svg>
+                                            Edit
+                                        </button>
+                                        <div class="dropdown-divider"></div>
+                                        <button type="button" class="dropdown-item text-danger remove-admin" data-id="{{ $val->id }}" data-name="{{ $val->name }}" @if($val->id === auth()->id()) disabled @endif>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6m4-6v6"/></svg>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </td>
                             @endif
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="{{ 3 + (int) $table->kemampuan + (int) $table->aksi }}" class="text-center text-muted py-4">Data pengguna tidak ditemukan.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer d-flex align-items-center">
-                <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+            <div class="card-footer d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+                <p class="m-0 text-muted">
+                    Menampilkan <span>{{ $pengguna->firstItem() ?? 0 }}</span>
+                    sampai <span>{{ $pengguna->lastItem() ?? 0 }}</span>
+                    dari <span>{{ $pengguna->total() }}</span> data
+                </p>
                 <ul class="pagination m-0 ms-auto">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <li class="page-item {{ $pengguna->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $controller->prevPagination($pengguna->currentPage(), 'pengguna', request()->all())->link }}" aria-label="Sebelumnya">
                             <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                 <polyline points="15 6 9 12 15 18"></polyline>
                             </svg>
-                            prev
+                            Sebelumnya
                         </a>
                     </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">5</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">
-                            next
+                    @foreach($controller->counterPagination($pengguna->lastPage(), $pengguna->currentPage(), 'pengguna', request()->all()) as $page)
+                    <li class="page-item {{ $page->is_active ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $page->link }}">{{ $page->lable }}</a>
+                    </li>
+                    @endforeach
+                    <li class="page-item {{ $pengguna->hasMorePages() ? '' : 'disabled' }}">
+                        <a class="page-link" href="{{ $controller->nextPagination($pengguna->currentPage(), $pengguna->lastPage(), 'pengguna', request()->all())->link }}" aria-label="Berikutnya">
+                            Berikutnya
                             <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -129,34 +175,33 @@
                     </li>
                 </ul>
             </div>
-        </div>
     </div>
 </div>
 @endsection
 @section('modal')
-<div class="modal modal-blur fade" id="modal-import" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
+<div class="modal fade" id="modal-import" tabindex="-1" aria-labelledby="import-personnel-title" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Import Data Admin</h5>
+                <h3 class="modal-title" id="import-personnel-title">Import Personel</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="form-import" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label class="form-label">File Excel</label>
-                        <input type="file" class="form-control" name="file" accept=".xlsx, .xls">
+                        <label for="personnel-import-file" class="form-label required">File Excel</label>
+                        <input id="personnel-import-file" type="file" class="form-control" name="file" accept=".xlsx, .xls" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Batal
-                </a>
-                <a href="#" class="btn btn-primary ms-auto" onclick="submitImport()">
+                </button>
+                <button type="submit" form="form-import" class="btn btn-primary ms-auto" id="import-personnel-submit">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                     Import
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -183,99 +228,148 @@
         </div>
     </div>
 </div>
-<!-- Confirm delete -->
-<div class="modal modal-blur fade" id="modal-confirm" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            <div class="modal-status bg-danger"></div>
-            <div class="modal-body text-center py-4">
-                <span class="h2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <line x1="4" y1="7" x2="20" y2="7"></line>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-                    </svg>
-                </span>
-                <h3>Hapus Data ?</h3>
-                <div class="text-muted">Apakah yakin ingin menghapus data ini ?</div>
+<div class="modal fade" id="modal-edit-admin" tabindex="-1" aria-labelledby="edit-admin-title" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <form class="modal-content" id="edit-admin-form">
+            <div class="modal-header">
+                <h3 class="modal-title" id="edit-admin-title">Edit Admin</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-            <div class="modal-footer">
-                <div class="w-100">
-                    <div class="row">
-                        <div class="col">
-                            <a href="#" class="btn w-100" data-bs-dismiss="modal">
-                                Batal
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a href="#" id="btn-action" class="btn btn-danger w-100" onclick="">
-                                Hapus
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-body">
+                <div class="mb-3"><label for="admin-name" class="form-label required">Nama</label><input id="admin-name" name="name" class="form-control" maxlength="255" required></div>
+                <div class="mb-3"><label for="admin-email" class="form-label required">Username</label><input id="admin-email" name="email" class="form-control" maxlength="255" required></div>
+                <div class="mb-3"><label for="admin-password" class="form-label">Password Baru</label><input type="password" id="admin-password" name="password" class="form-control" minlength="8" autocomplete="new-password"></div>
+                <div><label for="admin-password-confirmation" class="form-label">Konfirmasi Password Baru</label><input type="password" id="admin-password-confirmation" name="password_confirmation" class="form-control" minlength="8" autocomplete="new-password"></div>
             </div>
-        </div>
+            <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary" id="save-admin-edit">Simpan</button></div>
+        </form>
     </div>
 </div>
 @endsection
 @push('script')
 <script>
-    const _inputSearch = 'input[name="search"]';
-
-    const onSearch = () => {
-        let searchData = $(_inputSearch).val();
-        location.href = "<?= url()->current() . '?filter[name]=' ?>" + searchData + "<?= '&key=' . $role->key ?>";
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('edit-admin-form');
+    const modal = new bootstrap.Modal(document.getElementById('modal-edit-admin'));
+    let editUrl = null;
+    const save = document.getElementById('save-admin-edit');
+    const done = () => {
+        sessionStorage.setItem('user-import-message', 'Data pengguna berhasil diperbarui.');
+        location.reload();
+    };
+    const failure = response => {
+        const errors = response.responseJSON?.errors;
+        notif(errors ? Object.values(errors).flat().join(' ') : response.responseJSON?.message || 'Perubahan gagal disimpan.', 'danger');
+    };
+    document.querySelectorAll('.edit-admin').forEach(action => action.addEventListener('click', () => {
+        form.reset();
+        editUrl = action.dataset.url;
+        document.getElementById('edit-admin-title').textContent = 'Edit ' + (action.dataset.kind || 'Admin');
+        form.elements.name.value = action.dataset.name;
+        form.elements.email.value = action.dataset.email;
+        modal.show();
+    }));
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (save.disabled || !form.reportValidity()) return;
+        save.disabled = true;
+        $.ajax({ url: editUrl, type: 'PATCH', data: $(form).serialize(), headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
+            .done(done).fail(failure).always(() => { save.disabled = false; });
+    });
+    document.querySelectorAll('.delete-personnel').forEach(action => action.addEventListener('click', async () => {
+        if (action.disabled || !await confirmDelete('Hapus personel "' + action.dataset.name + '" beserta data kemampuannya?')) return;
+        action.disabled = true;
+        $.ajax({ url: action.dataset.url, type: 'DELETE', headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
+            .done(() => {
+                sessionStorage.setItem('user-import-message', 'Personel berhasil dihapus.');
+                location.reload();
+            }).fail(failure).always(() => { action.disabled = false; });
+    }));
+    document.querySelectorAll('.remove-admin').forEach(action => action.addEventListener('click', async () => {
+        if (action.disabled || !await confirmDelete('Hapus akses admin "' + action.dataset.name + '"? Pengguna akan kembali menjadi Personel.')) return;
+        action.disabled = true;
+        $.ajax({ url: @json(route('pengguna.update_role')), type: 'POST', data: { id: action.dataset.id, role: 3 }, headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
+            .done(done).fail(failure).always(() => { action.disabled = false; });
+    }));
+    document.querySelectorAll('.admin-action').forEach(action => {
+        const menu = action.nextElementSibling;
+        action.addEventListener('shown.bs.dropdown', () => {
+            document.body.appendChild(menu);
+            const bounds = action.getBoundingClientRect();
+            menu.style.setProperty('transform', 'none');
+            menu.style.setProperty('inset', 'auto');
+            menu.style.left = Math.max(8, bounds.right - menu.offsetWidth) + 'px';
+            menu.style.top = Math.max(8, bounds.bottom + menu.offsetHeight + 4 > innerHeight ? bounds.top - menu.offsetHeight - 4 : bounds.bottom + 4) + 'px';
+        });
+        action.addEventListener('hidden.bs.dropdown', () => {
+            action.parentElement.appendChild(menu);
+            menu.removeAttribute('style');
+        });
+    });
+});
 </script>
-@endpush
-@push('script')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const message = sessionStorage.getItem('user-import-message');
+    if (message) {
+        sessionStorage.removeItem('user-import-message');
+        notif(message, 'success');
+    }
+});
+</script>
 <script>
     // Import
     const openModalImport = () => {
-        $('#modal-import').modal('show');
+        document.getElementById('form-import').reset();
+        const element = document.getElementById('modal-import');
+        (bootstrap.Modal.getInstance(element) || new bootstrap.Modal(element)).show();
     }
 
     const submitImport = () => {
         const form = document.getElementById('form-import');
+        const button = document.getElementById('import-personnel-submit');
+        if (button.disabled || !form.reportValidity()) return;
+        const original = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengimpor...';
         let formData = new FormData(form);
-
-        // Show loading state if possible or just rely on alert later
-        // You might want to add a loader here if you have a global loader function
 
         fetch("{{ route('pengguna.import') }}", {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert(data.message);
-                $('#modal-import').modal('hide');
+                sessionStorage.setItem('user-import-message', data.message || 'Data berhasil diimpor.');
+                bootstrap.Modal.getInstance(document.getElementById('modal-import')).hide();
                 location.reload();
             } else {
-                alert(data.message || 'Terjadi kesalahan');
+                notif(data.errors ? Object.values(data.errors).flat().join(' ') : data.message || 'Terjadi kesalahan', 'danger');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Terjadi kesalahan sistem');
+            notif('Terjadi kesalahan sistem', 'danger');
+        }).finally(() => {
+            button.disabled = false;
+            button.innerHTML = original;
         });
     }
+    document.getElementById('form-import').addEventListener('submit', event => {
+        event.preventDefault();
+        submitImport();
+    });
 </script>
 @endpush
 @push('script')
 <script>
     // Modal delete
-    const _modalDeleteConfirm = '#modal-confirm';
     let _modal_user = '#modal-user';
     let _modal_list_user = '#modal-user #list-user';
 
@@ -335,10 +429,5 @@
         });
     }
 
-    // Delete pejabat
-    const deletePejabat = (id) => {
-        $(_modalDeleteConfirm + ' #btn-action').attr('onclick', `saveAdmin(${id}, 3)`);
-        openModal(_modalDeleteConfirm);
-    }
 </script>
 @endpush

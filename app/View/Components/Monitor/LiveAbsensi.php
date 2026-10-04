@@ -13,10 +13,14 @@ class LiveAbsensi extends Component
      */
 
     public $user;
+    public $userIds;
+    public $controller;
 
-    public function __construct($user)
+    public function __construct($user, $userIds = [], $controller = null)
     {
         $this->user = $user;
+        $this->userIds = $userIds;
+        $this->controller = $controller;
     }
 
     /**

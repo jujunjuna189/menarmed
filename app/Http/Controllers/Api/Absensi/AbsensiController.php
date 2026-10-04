@@ -19,7 +19,12 @@ class AbsensiController extends Controller
     public function showTodayPresence()
     {
         try {
-            $response['today_presence'] = AbsensiModel::whereDate('created_at', Carbon::now())->get();
+            $response['today_presence'] = AbsensiModel::whereDate('created_at', Carbon::now())
+                ->select('user_id', 'ket', 'latitude', 'longitude', 'created_at')
+                ->latest('created_at')
+                ->get()
+                ->unique('user_id')
+                ->values();
 
             if ($response) {
                 return response()->json([

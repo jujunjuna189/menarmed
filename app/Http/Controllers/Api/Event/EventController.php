@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EventModel;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -13,11 +14,13 @@ class EventController extends Controller
     public function show(Request $request)
     {
         try {
-            if (isset($request->tanggal) || $request->tanggal != "") {
-                $where['tanggal'] = $request->tanggal;
-            }
+            $validated = $request->validate([
+                'tanggal' => ['required', 'date_format:Y-m-d'],
+            ]);
 
-            $event = EventModel::where($where)->get();
+            $event = EventModel::where('tanggal', $validated['tanggal'])
+                ->orderBy('id')
+                ->get();
 
             if ($event) {
                 return response()->json([
@@ -30,6 +33,8 @@ class EventController extends Controller
                     'data' => [],
                 ], 300);
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'Server Error',
@@ -41,9 +46,11 @@ class EventController extends Controller
     public function store(Request $request)
     {
         try {
-            $data['tanggal'] = $request->tanggal;
-            $data['event'] = $request->event;
-            $data['color'] = $request->color;
+            $data = $request->validate([
+                'tanggal' => ['required', 'date_format:Y-m-d'],
+                'event' => ['required', 'string', 'max:255'],
+                'color' => ['required', Rule::in(['success', 'primary', 'danger', 'warning', 'dark'])],
+            ]);
 
             $event = EventModel::create($data);
 
@@ -58,6 +65,8 @@ class EventController extends Controller
                     'data' => [],
                 ], 300);
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'Server Error',
@@ -69,7 +78,10 @@ class EventController extends Controller
     public function delete(Request $request)
     {
         try {
-            $event = EventModel::find($request->id);
+            $validated = $request->validate([
+                'id' => ['required', 'integer', 'exists:event,id'],
+            ]);
+            $event = EventModel::findOrFail($validated['id']);
             $event->delete();
 
             if ($event) {
@@ -83,6 +95,8 @@ class EventController extends Controller
                     'data' => [],
                 ], 300);
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'Server Error',

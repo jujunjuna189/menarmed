@@ -16,41 +16,22 @@ class ReportController extends Controller
 {
     public function absensi(Request $request)
     {
-        $startDate = $request->get('start_date', date('Y-m-01'));
-        $endDate = $request->get('end_date', date('Y-m-t'));
-        $search = $request->get('filter', []);
-        $pageSize = $request->input('page.size', 10);
-
-        $query = AbsensiModel::with('userModel')
-            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->whereHas('userModel', function($q) use ($search) {
-                if (isset($search['name'])) {
-                    $q->where('name', 'like', '%' . $search['name'] . '%');
-                }
-            })
-            ->orderBy('created_at', 'desc');
-
-        $data['report'] = QueryBuilder::for($query)
-            ->paginate($pageSize)->appends($request->input());
-            
-        $data['no'] = 0;
-        $data['controller'] = $this;
-        $data['start_date'] = $startDate;
-        $data['end_date'] = $endDate;
-        $data['page_size'] = $pageSize;
-        $data['search_name'] = $search['name'] ?? '';
-
-        $data['summaryData'] = \App\Models\AbsensiModel::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->whereHas('userModel', function($q) use ($search) {
-                if (isset($search['name'])) {
-                    $q->where('name', 'like', '%' . $search['name'] . '%');
-                }
-            })
-            ->select('ket', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
-            ->groupBy('ket')
-            ->get();
-
-        return view('rekap_data.absensi', $data);
+        $request->validate(['month' => ['nullable', 'date_format:Y-m'], 'filter.name' => ['nullable', 'string']]);
+        $month = \Carbon\Carbon::createFromFormat('!Y-m', $request->input('month', now()->format('Y-m')));
+        $search = trim((string) $request->input('filter.name', ''));
+        $size = (int) $request->input('page.size', 10);
+        $size = in_array($size, [10, 25, 50, 100], true) ? $size : 10;
+        $people = \App\Support\MonthlyAttendance::people($search)
+            ->paginate($size, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))
+            ->appends($request->only(['month', 'filter', 'page']));
+        return view('rekap_data.absensi', [
+            'people' => $people,
+            'attendance' => \App\Support\MonthlyAttendance::records($month, $people->pluck('id')),
+            'month' => $month,
+            'page_size' => $size,
+            'search_name' => $search,
+            'controller' => $this,
+        ]);
     }
 
     public function updateAbsensi(Request $request, $id)
@@ -71,6 +52,11 @@ class ReportController extends Controller
 
     public function exportAbsensi(Request $request)
     {
+        if ($request->filled('month')) {
+            $request->validate(['month' => ['required', 'date_format:Y-m'], 'filter.name' => ['nullable', 'string']]);
+            $month = \Carbon\Carbon::createFromFormat('!Y-m', $request->month);
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\MonthlyAbsensiExport($month, (string) $request->input('filter.name', '')), 'rekap_absensi_' . $month->format('Y-m') . '.xlsx');
+        }
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
@@ -80,6 +66,13 @@ class ReportController extends Controller
 
     public function exportAbsensiPdf(Request $request)
     {
+        if ($request->filled('month')) {
+            $request->validate(['month' => ['required', 'date_format:Y-m'], 'filter.name' => ['nullable', 'string']]);
+            $month = \Carbon\Carbon::createFromFormat('!Y-m', $request->month);
+            $export = new \App\Exports\MonthlyAbsensiExport($month, (string) $request->input('filter.name', ''));
+            return \Barryvdh\DomPDF\Facade\Pdf::loadView('rekap_data.absensi_monthly_pdf', ['month' => $month, 'rows' => $export->collection(), 'headings' => $export->headings()])
+                ->setPaper('a3', 'landscape')->download('rekap_absensi_' . $month->format('Y-m') . '.pdf');
+        }
         ini_set('memory_limit', '1024M');
         set_time_limit(0);
 
@@ -104,10 +97,12 @@ class ReportController extends Controller
 
     public function perizinan(Request $request)
     {
+        $request->validate(['start_date' => ['nullable', 'date_format:Y-m-d'], 'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'], 'filter.name' => ['nullable', 'string']]);
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
-        $pageSize = $request->input('page.size', 10);
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
 
         $query = PerizinanModel::with('userModel')
             ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -118,8 +113,8 @@ class ReportController extends Controller
             })
             ->orderBy('keluar', 'desc');
 
-        $data['report'] = QueryBuilder::for($query)
-            ->paginate($pageSize)->appends($request->input());
+        $data['report'] = $query
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))->appends($request->input());
             
         $data['no'] = 1;
         $data['controller'] = $this;
@@ -137,7 +132,7 @@ class ReportController extends Controller
             'tujuan' => 'required|string|max:255',
             'jenis_kendaraan' => 'required|string|max:255',
             'keluar' => 'required|date',
-            'masuk' => 'required|date',
+            'masuk' => 'nullable|date|after_or_equal:keluar',
         ]);
 
         $perizinan = PerizinanModel::findOrFail($id);
@@ -186,10 +181,12 @@ class ReportController extends Controller
 
     public function ranpur(Request $request)
     {
+        $request->validate(['start_date' => ['nullable', 'date_format:Y-m-d'], 'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'], 'filter.name' => ['nullable', 'string']]);
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
-        $pageSize = $request->input('page.size', 10);
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
 
         $query = PerizinanRanpurModel::with('userModel')
             ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -200,8 +197,8 @@ class ReportController extends Controller
             })
             ->orderBy('keluar', 'desc');
 
-        $data['report'] = QueryBuilder::for($query)
-            ->paginate($pageSize)->appends($request->input());
+        $data['report'] = $query
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))->appends($request->input());
             
         $data['no'] = 0;
         $data['controller'] = $this;
@@ -268,10 +265,12 @@ class ReportController extends Controller
 
     public function kendaraan(Request $request)
     {
+        $request->validate(['start_date' => ['nullable', 'date_format:Y-m-d'], 'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'], 'filter.name' => ['nullable', 'string']]);
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
-        $pageSize = $request->input('page.size', 10);
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
 
         $query = PerizinanKendaraanModel::with('userModel')
             ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -282,8 +281,8 @@ class ReportController extends Controller
             })
             ->orderBy('keluar', 'desc');
 
-        $data['report'] = QueryBuilder::for($query)
-            ->paginate($pageSize)->appends($request->input());
+        $data['report'] = $query
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))->appends($request->input());
             
         $data['no'] = 0;
         $data['controller'] = $this;
@@ -351,10 +350,17 @@ class ReportController extends Controller
 
     public function gudang_senjata(Request $request)
     {
+        $request->validate([
+            'start_date' => 'nullable|date_format:Y-m-d',
+            'end_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
+            'filter.name' => 'nullable|string',
+        ]);
+
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
-        $pageSize = $request->input('page.size', 10);
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
 
         $query = GudangSenjataModel::with('userModel')
             ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -366,7 +372,8 @@ class ReportController extends Controller
             ->orderBy('keluar', 'desc');
 
         $data['report'] = QueryBuilder::for($query)
-            ->paginate($pageSize)->appends($request->input());
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))
+            ->appends($request->input());
             
         $data['no'] = 0;
         $data['controller'] = $this;
@@ -433,10 +440,17 @@ class ReportController extends Controller
 
     public function logistik(Request $request)
     {
+        $request->validate([
+            'start_date' => 'nullable|date_format:Y-m-d',
+            'end_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
+            'filter.name' => 'nullable|string',
+        ]);
+
         $startDate = $request->get('start_date', date('Y-m-01'));
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
-        $pageSize = $request->input('page.size', 10);
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
 
         $query = LogistikModel::with('userModel')
             ->whereBetween('keluar', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -448,7 +462,8 @@ class ReportController extends Controller
             ->orderBy('keluar', 'desc');
 
         $data['report'] = QueryBuilder::for($query)
-            ->paginate($pageSize)->appends($request->input());
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))
+            ->appends($request->input());
             
         $data['no'] = 0;
         $data['controller'] = $this;

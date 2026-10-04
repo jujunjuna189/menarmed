@@ -1,0 +1,29 @@
+.app-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #dce1e7;
+    border-left: 4px solid #4299e1;
+    border-radius: 6px;
+    color: #182433;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .16s ease, transform .16s ease;
+}
+.app-toast.is-visible { opacity: 1; transform: translateY(0); }
+.app-toast-success { border-left-color: #2fb344; }
+.app-toast-warning { border-left-color: #f59f00; }
+.app-toast-danger { border-left-color: #d63939; }
+.app-toast > span { min-width: 0; overflow-wrap: anywhere; }
+.app-toast .btn-close { flex-shrink: 0; margin-left: auto; }
+@media (prefers-reduced-motion: reduce) {
+    .app-toast { transition: none; transform: none; }
+}

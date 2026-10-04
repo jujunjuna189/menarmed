@@ -11,9 +11,25 @@ class SaranController extends Controller
 {
     public function index(Request $request)
     {
-        $data['saran'] = QueryBuilder::for(SaranModel::class)->orderBy('id', 'desc')
-            ->jsonPaginate(10)->appends($request->input());
-        $data['no'] = 1;
+        $request->validate(['search' => 'nullable|string|max:255']);
+        $search = trim((string) $request->input('search', ''));
+        $pageSize = (int) $request->input('page.size', 10);
+        $pageSize = in_array($pageSize, [10, 25, 50, 100], true) ? $pageSize : 10;
+
+        $query = SaranModel::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('from_display', 'like', '%' . $search . '%')
+                        ->orWhere('message', 'like', '%' . $search . '%');
+                });
+            })
+            ->orderBy('id', 'desc');
+        $data['saran'] = QueryBuilder::for($query)
+            ->paginate($pageSize, ['*'], 'page[number]', max(1, (int) $request->input('page.number', 1)))
+            ->appends($request->input());
+        $data['controller'] = $this;
+        $data['search'] = $search;
+        $data['page_size'] = $pageSize;
 
         return view('saran.index', $data);
     }

@@ -1,92 +1,120 @@
 @extends('layouts.app_template')
 @section('content')
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header justify-content-between">
-                <h3 class="card-title">E-Learning</h3>
-                <div>
-                    <span class="btn bg-blue-lt border-dashed" onclick="openModalELearning()">Tambah E-Learning</span>
+<style>
+    .learning-page .btn, #modal-e-learning .btn { box-shadow: none !important; }
+    .learning-table { table-layout: fixed; min-width: 600px; }
+    .learning-table td { padding-top: 10px; padding-bottom: 10px; }
+    .learning-summary { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .learning-actions { width: 30px; height: 30px; padding: 0; border: 0; background: transparent; }
+    .learning-menu { position: fixed !important; z-index: 1050; border: 1px solid #dce1e7; box-shadow: none; }
+    .learning-controls .input-icon { width: 240px; }
+    @media (max-width: 575.98px) {
+        .learning-controls, .learning-controls form { width: 100%; }
+        .learning-controls .input-icon { flex: 1; min-width: 0; width: auto; }
+    }
+</style>
+<div class="learning-page">
+    <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-2 mb-3">
+        <h2 class="page-title mb-0">E-Learning</h2>
+        <div class="learning-controls d-flex flex-wrap align-items-center gap-2">
+            <form action="{{ route('e-learning') }}" method="GET" class="d-flex gap-2">
+                <div class="input-icon">
+                    <span class="input-icon-addon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m21 21-6-6"/></svg>
+                    </span>
+                    <input type="search" name="search" value="{{ $search }}" class="form-control" placeholder="Cari materi" aria-label="Cari e-learning">
                 </div>
-            </div>
-            <div class="card-body border-bottom py-3">
-                <div class="d-flex">
-                    <div class="text-muted">
-                        Show
-                        <div class="mx-2 d-inline-block">
-                            <input type="text" class="form-control form-control-sm" value="8" size="3" aria-label="Invoices count">
-                        </div>
-                        entries
-                    </div>
-                    <div class="ms-auto text-muted">
-                        Search:
-                        <div class="ms-2 d-inline-block">
-                            <input type="text" class="form-control form-control-sm" aria-label="Search invoice">
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <select name="page[size]" class="form-select w-auto" onchange="this.form.requestSubmit()" aria-label="Jumlah data per halaman">
+                    @foreach([10, 25, 50, 100] as $size)
+                        <option value="{{ $size }}" {{ $page_size === $size ? 'selected' : '' }}>{{ $size }} data</option>
+                    @endforeach
+                </select>
+            </form>
+            <button type="button" class="btn btn-primary" id="add-learning">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Tambah E-Learning
+            </button>
+        </div>
+    </div>
+    <div class="card">
             <div class="table-responsive">
-                <table class="table card-table table-vcenter text-nowrap datatable">
+                <table class="table card-table table-vcenter learning-table mb-0">
                     <thead>
                         <tr>
-                            <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
-                            <th class="w-1">No.
-                                <!-- Download SVG icon from http://tabler-icons.io/i/chevron-up -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-dark icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <polyline points="6 15 12 9 18 15"></polyline>
-                                </svg>
-                            </th>
-                            <th>Judul</th>
+                            <th style="width: 60px">No.</th>
+                            <th style="width: 30%">Judul</th>
                             <th>Deskripsi</th>
-                            <th>(URL) Tujuan</th>
-                            <th style="width: 10rem;" class="bg-dark text-center">Aksi</th>
+                            <th>URL Materi</th>
+                            <th style="width: 64px;" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($learning as $val)
+                        @forelse($learning as $key => $val)
                         <tr>
-                            <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                            <td>{{ $no++ }}</td>
-                            <td>{{ $val->judul ?? '...' }}</td>
-                            <td>{{ substr($val->deskripsi, 0, 20)}}...</td>
-                            <td>{{ substr($val->path, 0, 25) }}...</td>
+                            <td>{{ $learning->firstItem() + $key }}</td>
+                            <td class="learning-summary fw-medium">{{ $val->judul ?: '-' }}</td>
+                            <td class="learning-summary text-muted">{{ $val->deskripsi ?: '-' }}</td>
+                            <td class="learning-summary text-muted">{{ $val->path }}</td>
                             <td class="text-center">
-                                <span onclick="window.open('<?= $val->path ?>', '_target')" class="btn btn-icon border-dashed" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Lihat">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                        <circle cx="12" cy="12" r="2"></circle>
-                                        <path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7"></path>
-                                    </svg>
-                                </span>
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-icon learning-actions" data-bs-toggle="dropdown" aria-expanded="false" title="Aksi materi" aria-label="Aksi materi {{ $val->judul }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end learning-menu">
+                                        @if(in_array(strtolower(parse_url($val->path ?? '', PHP_URL_SCHEME) ?? ''), ['http', 'https'], true))
+                                            <a href="{{ $val->path }}" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6m0-6L10 14M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/></svg>
+                                                Buka Materi
+                                            </a>
+                                        @else
+                                            <span class="dropdown-item disabled" aria-disabled="true">URL tidak valid</span>
+                                        @endif
+                                        <button type="button" class="dropdown-item edit-learning" data-url="{{ route('e-learning.update', $val->id) }}" data-title="{{ $val->judul }}" data-description="{{ $val->deskripsi }}" data-path="{{ $val->path }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/></svg>
+                                            Edit
+                                        </button>
+                                        <div class="dropdown-divider"></div>
+                                        <button type="button" class="dropdown-item text-danger delete-learning" data-url="{{ route('e-learning.destroy', $val->id) }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6m4-6v6"/></svg>
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">Data E-Learning tidak ditemukan.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer d-flex align-items-center">
-                <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+            <div class="card-footer d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+                <p class="m-0 text-muted">
+                    Menampilkan <span>{{ $learning->firstItem() ?? 0 }}</span>
+                    sampai <span>{{ $learning->lastItem() ?? 0 }}</span>
+                    dari <span>{{ $learning->total() }}</span> data
+                </p>
                 <ul class="pagination m-0 ms-auto">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <li class="page-item {{ $learning->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $controller->prevPagination($learning->currentPage(), 'e-learning', request()->all())->link }}" aria-label="Sebelumnya">
                             <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                 <polyline points="15 6 9 12 15 18"></polyline>
                             </svg>
-                            prev
+                            Sebelumnya
                         </a>
                     </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">4</a></li>
-                    <li class="page-item"><a class="page-link" href="#">5</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">
-                            next
+                    @foreach($controller->counterPagination($learning->lastPage(), $learning->currentPage(), 'e-learning', request()->all()) as $page)
+                    <li class="page-item {{ $page->is_active ? 'active' : '' }}">
+                        <a class="page-link" href="{{ $page->link }}">{{ $page->lable }}</a>
+                    </li>
+                    @endforeach
+                    <li class="page-item {{ $learning->hasMorePages() ? '' : 'disabled' }}">
+                        <a class="page-link" href="{{ $controller->nextPagination($learning->currentPage(), $learning->lastPage(), 'e-learning', request()->all())->link }}" aria-label="Berikutnya">
+                            Berikutnya
                             <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -96,37 +124,36 @@
                     </li>
                 </ul>
             </div>
-        </div>
     </div>
 </div>
 @endsection
 @section('modal')
-<div class="modal modal-blur fade" id="modal-e-learning" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+<div class="modal fade" id="modal-e-learning" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <form class="modal-content" id="learning-form">
             <div class="modal-header">
                 <h5 class="modal-title">Tambah E-Learning</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">Judul</label>
-                    <input type="text" class="form-control" name="judul" placeholder="..." required>
+                    <label for="learning-title" class="form-label required">Judul</label>
+                    <input type="text" class="form-control" id="learning-title" name="judul" maxlength="255" placeholder="Judul materi" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Deskripsi</label>
-                    <textarea class="form-control" rows="3" name="deskripsi" placeholder="..."></textarea>
+                    <label for="learning-description" class="form-label">Deskripsi</label>
+                    <textarea class="form-control" rows="3" id="learning-description" name="deskripsi" placeholder="Ringkasan materi"></textarea>
                 </div>
                 <div>
-                    <label class="form-label">(URL) Tujuan</label>
-                    <input type="text" class="form-control" name="path" placeholder="https://docs.google.com/presentation" required>
+                    <label for="learning-url" class="form-label required">URL Materi</label>
+                    <input type="url" class="form-control" id="learning-url" name="path" placeholder="https://docs.google.com/presentation" required>
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Batal
-                </a>
-                <a href="#" class="btn btn-primary ms-auto" onclick="saveELearning()">
+                </button>
+                <button type="submit" class="btn btn-primary ms-auto" id="save-learning">
                     <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -134,53 +161,103 @@
                         <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                     Simpan
-                </a>
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection
 @push('script')
 <script>
-    let _modal_learning = '#modal-e-learning';
-    let _modal_learning_judul = _modal_learning + ' input[name="judul"]';
-    let _modal_learning_deskripsi = _modal_learning + ' textarea[name="deskripsi"]';
-    let _modal_learning_path = _modal_learning + ' input[name="path"]';
-
-    const openModalELearning = () => {
-        $(_modal_learning).modal("show");
-    }
-
-    const closeModal = () => {
-        $(_modal_learning).modal("hide");
-    }
-
-    const getModalData = () => {
-        let judul = $(_modal_learning_judul).val();
-        let deskripsi = $(_modal_learning_deskripsi).val();
-        let path = $(_modal_learning_path).val();
-
-        let data = {
-            judul: judul,
-            deskripsi: deskripsi,
-            path: path,
-        };
-
-        return data;
-    }
-
-    const saveELearning = () => {
-        let data = getModalData();
-        requestServer({
-            url: url + '/api/e-learning/store',
-            data: data,
-            onLoader: true,
-            onSuccess: function(value) {
-                close_swal(true, 'Berhasil tambah e-learning', 'success');
-                closeModal();
-                reloadPage();
-            },
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('learning-form');
+    const modal = new bootstrap.Modal(document.getElementById('modal-e-learning'));
+    const button = document.getElementById('save-learning');
+    const original = button.innerHTML;
+    let editUrl = null;
+    const modalTitle = document.querySelector('#modal-e-learning .modal-title');
+    document.getElementById('add-learning').addEventListener('click', function () {
+        editUrl = null;
+        modalTitle.textContent = 'Tambah E-Learning';
+        form.reset();
+        modal.show();
+    });
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (button.disabled || !form.reportValidity()) return;
+        const path = form.elements.path.value.trim();
+        if (!/^https?:\/\//i.test(path)) {
+            notif('URL materi harus menggunakan http atau https.', 'error');
+            return;
+        }
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+        $.ajax({
+            url: editUrl || @json(url('/api/e-learning/store')),
+            type: editUrl ? 'PATCH' : 'POST',
+            dataType: 'json',
+            headers: { 'X-CSRF-TOKEN': token },
+            data: { judul: form.elements.judul.value.trim(), deskripsi: form.elements.deskripsi.value.trim(), path: path }
+        }).done(function (result) {
+            if (result.status !== 'Success') {
+                notif('Materi gagal disimpan.', 'error');
+                return;
+            }
+            modal.hide();
+            sessionStorage.setItem('learning-saved', editUrl ? 'E-Learning berhasil diperbarui.' : 'E-Learning berhasil ditambahkan.');
+            window.location.reload();
+        }).fail(function (response) {
+            const errors = response.responseJSON?.errors;
+            notif(errors ? Object.values(errors).flat().join(' ') : 'Materi gagal disimpan. Silakan coba lagi.', 'error');
+        }).always(function () {
+            button.disabled = false;
+            button.innerHTML = original;
         });
+    });
+    document.querySelectorAll('.edit-learning').forEach(function (action) {
+        action.addEventListener('click', function () {
+            editUrl = action.dataset.url;
+            form.elements.judul.value = action.dataset.title;
+            form.elements.deskripsi.value = action.dataset.description;
+            form.elements.path.value = action.dataset.path;
+            modalTitle.textContent = 'Edit E-Learning';
+            modal.show();
+        });
+    });
+    document.querySelectorAll('.delete-learning').forEach(function (action) {
+        action.addEventListener('click', async function () {
+            if (action.disabled || !await confirmDelete('Hapus materi e-learning ini?')) return;
+            action.disabled = true;
+            $.ajax({ url: action.dataset.url, type: 'DELETE', dataType: 'json', headers: { 'X-CSRF-TOKEN': token } })
+                .done(function () {
+                    sessionStorage.setItem('learning-saved', 'E-Learning berhasil dihapus.');
+                    window.location.reload();
+                }).fail(function () {
+                    notif('Materi gagal dihapus. Silakan coba lagi.', 'error');
+                    action.disabled = false;
+                });
+        });
+    });
+    document.querySelectorAll('.learning-actions').forEach(function (action) {
+        const menu = action.nextElementSibling;
+        action.addEventListener('shown.bs.dropdown', function () {
+            document.body.appendChild(menu);
+            const bounds = action.getBoundingClientRect();
+            menu.style.setProperty('transform', 'none');
+            menu.style.setProperty('inset', 'auto');
+            menu.style.left = Math.max(8, bounds.right - menu.offsetWidth) + 'px';
+            menu.style.top = Math.max(8, bounds.bottom + menu.offsetHeight + 4 > window.innerHeight ? bounds.top - menu.offsetHeight - 4 : bounds.bottom + 4) + 'px';
+        });
+        action.addEventListener('hidden.bs.dropdown', function () {
+            action.parentElement.appendChild(menu);
+            menu.removeAttribute('style');
+        });
+    });
+    const savedMessage = sessionStorage.getItem('learning-saved');
+    if (savedMessage) {
+        sessionStorage.removeItem('learning-saved');
+        notif(savedMessage, 'success');
     }
+});
 </script>
 @endpush

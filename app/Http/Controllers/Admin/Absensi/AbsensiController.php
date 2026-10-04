@@ -10,16 +10,36 @@ use Spatie\QueryBuilder\QueryBuilder;
 class AbsensiController extends Controller
 {
     //
-    public function index()
+    public function index(Request $request)
     {
-        $data['user'] = QueryBuilder::for(User::class)->allowedFilters(['name'])->get();
+        $pageSize = $request->input('page.size', 10);
+        $currentPage = $request->input('page.number', 1);
+        $userQuery = User::query()->where('role', '!=', 1)->select('id', 'name', 'pangkat');
+
+        $data['user'] = QueryBuilder::for(clone $userQuery)
+            ->allowedFilters(['name'])
+            ->defaultSort('name', 'id')
+            ->allowedSorts(['name', 'pangkat'])
+            ->orderBy('id')
+            ->paginate($pageSize, ['*'], 'page[number]', $currentPage)
+            ->appends($request->input());
+        $data['userIds'] = QueryBuilder::for(clone $userQuery)
+            ->allowedFilters(['name'])
+            ->getEloquentBuilder()
+            ->pluck('id')
+            ->map(fn ($id) => (string) $id)
+            ->values();
+        $data['controller'] = $this;
 
         return view('monitor.absensi', $data);
     }
 
     public function track_maps()
     {
-        $data['user'] = User::all();
+        $data['user'] = User::where('role', '!=', 1)
+            ->select('id', 'name', 'pangkat')
+            ->orderBy('name')
+            ->get();
         return view('monitor.track_maps', $data);
     }
 

@@ -21,11 +21,16 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::post('/api/artikel/store', [App\Http\Controllers\Api\Artikel\ArtikelController::class, 'store'])
+    ->middleware('auth:sanctum')->name('artikel.store');
+
 // Artikel Views
 Route::get('/artikel/view', [App\Http\Controllers\Admin\Artikel\ArtikelController::class, 'view'])->name('artikel.view');
 
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/log-viewer', [App\Http\Controllers\Admin\LogViewerController::class, 'index'])->name('log-viewer.index');
     Route::get('/log-viewer/download', [App\Http\Controllers\Admin\LogViewerController::class, 'download'])->name('log-viewer.download');
     // Monitor
@@ -35,19 +40,30 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/track_maps', [App\Http\Controllers\Admin\Absensi\AbsensiController::class, 'track_maps'])->name('track_maps');
     // Event
     Route::get('/event', [App\Http\Controllers\Admin\Event\EventController::class, 'index'])->name('event');
+    Route::post('/event', [App\Http\Controllers\Admin\Event\EventController::class, 'store'])->name('event.store');
+    Route::patch('/event/{event}', [App\Http\Controllers\Admin\Event\EventController::class, 'update'])->name('event.update');
+    Route::delete('/event/{event}', [App\Http\Controllers\Admin\Event\EventController::class, 'destroy'])->name('event.destroy');
     // Artikel
     Route::get('/artikel', [App\Http\Controllers\Admin\Artikel\ArtikelController::class, 'index'])->name('artikel');
     Route::get('/artikel/create', [App\Http\Controllers\Admin\Artikel\ArtikelController::class, 'create'])->name('artikel.create');
+    Route::delete('/artikel/{artikel}', [App\Http\Controllers\Admin\Artikel\ArtikelController::class, 'destroy'])->name('artikel.destroy');
     // E-Learning
     Route::get('/e-learning', [App\Http\Controllers\Admin\ELearning\ELearningController::class, 'index'])->name('e-learning');
+    Route::patch('/e-learning/{learning}', [App\Http\Controllers\Admin\ELearning\ELearningController::class, 'update'])->name('e-learning.update');
+    Route::delete('/e-learning/{learning}', [App\Http\Controllers\Admin\ELearning\ELearningController::class, 'destroy'])->name('e-learning.destroy');
     // QrCode
     Route::get('/qrcode', [App\Http\Controllers\Admin\QrCode\QrCodeController::class, 'index'])->name('qrcode');
+    Route::patch('/qrcode/{qrcode}', [App\Http\Controllers\Admin\QrCode\QrCodeController::class, 'update'])->name('qrcode.update');
+    Route::get('/qrcode/{qrcode}/print', [App\Http\Controllers\Admin\QrCode\QrCodeController::class, 'print'])->name('qrcode.print');
     Route::get('/generate', [App\Http\Controllers\Admin\QrCode\QrCodeController::class, 'generate'])->name('generate');
     // Pengguna
     Route::get('/pengguna', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'index'])->name('pengguna');
     Route::get('/pengguna/json', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'indexJson'])->name('pengguna.json');
     Route::get('/pengguna/view', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'view'])->name('pengguna.view');
     Route::post('/pengguna/update-role', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updateRole'])->name('pengguna.update_role');
+    Route::patch('/pengguna/admin/{user}', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updateAdmin'])->name('pengguna.admin.update');
+    Route::patch('/pengguna/personel/{user}', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updatePersonel'])->name('pengguna.personel.update');
+    Route::delete('/pengguna/personel/{user}', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'destroyPersonel'])->name('pengguna.personel.destroy');
     Route::post('/pengguna/import', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'import'])->name('pengguna.import');
     Route::get('/pengguna/template', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'downloadTemplate'])->name('pengguna.template');
     // Pejabat
@@ -81,4 +97,5 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/report/logistik/pdf', [App\Http\Controllers\Admin\Report\ReportController::class, 'exportLogistikPdf'])->name('report.logistik.pdf');
     // Pengaturan
     Route::get('/pengaturan', [App\Http\Controllers\Admin\Pengaturan\PengaturanController::class, 'index'])->name('pengaturan');
+    Route::post('/pengaturan/slider/{id}', [App\Http\Controllers\Admin\Pengaturan\PengaturanController::class, 'updateSlider'])->name('pengaturan.slider.update');
 });

@@ -25,7 +25,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'key' => 3,
-                'role' => 'Personil',
+                'role' => 'Personel',
                 'created_at' => date('Y-m-d h:i:s'),
                 'updated_at' => date('Y-m-d h:i:s'),
             ],

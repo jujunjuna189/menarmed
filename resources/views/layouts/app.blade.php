@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login - {{ env('APP_NAME') }}</title>
+    <title>@yield('title', 'Login') - {{ config('app.name') }}</title>
     <!-- CSS files -->
     <link href="{{ asset('assets/dist/css/tabler.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />

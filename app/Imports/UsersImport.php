@@ -20,7 +20,7 @@ class UsersImport implements ToModel, WithHeadingRow
             'name'          => $row['nama'],
             'email'         => $row['email'],
             'password'      => Hash::make($row['password']),
-            'role'          => $row['role_id'] ?? 3, // Default to Personil if not specified
+            'role'          => $row['role_id'] ?? 3, // Default to Personel if not specified
             'pangkat'       => $row['pangkat'] ?? null,
             'korp'          => $row['korp'] ?? null,
             'satuan'        => $row['satuan'] ?? null,

@@ -26,6 +26,8 @@
     <!-- Summernote -->
     <link rel="stylesheet" href="{{ asset('assets/pus_dist/lib/summernote/summernote-lite.css') }}">
     <!-- ....... -->
+    <link href="{{ asset('assets/pus_dist/css/sidebar.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/pus_dist/css/notifications.css') }}" rel="stylesheet" />
 </head>
 
 <body class="layout-fluid theme-light">
@@ -78,7 +80,7 @@
                             </a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ route('absensi') }}">
-                                    Absensi Personil
+                                    Absensi Personel
                                 </a>
                             </div>
                         </li>
@@ -259,6 +261,7 @@
                             </a>
                         </li>
                         <hr class="my-2">
+                        {{-- Log Viewer temporarily hidden from navigation.
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('log-viewer.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -275,6 +278,7 @@
                                 </span>
                             </a>
                         </li>
+                        --}}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('pengaturan') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -299,7 +303,13 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                <button type="button" class="btn sidebar-toggle-btn" id="sidebar-toggle" title="Kecilkan sidebar" aria-label="Kecilkan sidebar" aria-expanded="true" aria-controls="navbar-menu">
+                    <span class="sidebar-toggle-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g class="sidebar-toggle-arrow"><path d="m11 7-5 5 5 5m7-10-5 5 5 5"/></g></svg>
+                    </span>
+                </button>
                 <div class="navbar-nav flex-row order-md-last ms-auto">
+                    {{--
                     <div class="d-none d-md-flex">
                         <div class="nav-item dropdown d-none d-md-flex me-3">
                             <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
@@ -402,6 +412,7 @@
                             </div>
                         </div>
                     </div>
+                    --}}
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
                             <span class="avatar avatar-sm">{{ substr(Auth::user()->name, 0, 2) }}</span>
@@ -411,11 +422,13 @@
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                            <a href="{{ route('profile.edit') }}" class="dropdown-item">Profile &amp; Account</a>
+                            {{--
                             <a href="#" class="dropdown-item">Set status</a>
-                            <a href="#" class="dropdown-item">Profile &amp; account</a>
                             <a href="#" class="dropdown-item">Feedback</a>
                             <div class="dropdown-divider"></div>
                             <a href="#" class="dropdown-item">Settings Account</a>
+                            --}}
                             <a href="#" class="dropdown-item" onclick="logout_app()">Logout</a>
                         </div>
                     </div>
@@ -441,7 +454,7 @@
                                 </li>
                                 <li class="list-inline-item">
                                     <a href="./changelog.html" class="link-secondary" rel="noopener">
-                                        v1.0.0-beta
+                                        v.2.4.0
                                     </a>
                                 </li>
                             </ul>
@@ -482,6 +495,8 @@
         let token = "<?= Illuminate\Support\Facades\Session::token() ?>";
         let auth_user = <?= json_encode(Illuminate\Support\Facades\Auth::user()) ?>;
     </script>
+    <script src="{{ asset('assets/pus_dist/js/sidebar.js') }}"></script>
+    @include('components.delete-confirmation')
     @stack('script')
 </body>
 

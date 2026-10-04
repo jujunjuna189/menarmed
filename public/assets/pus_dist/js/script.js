@@ -144,34 +144,82 @@ const arrayGroupByKey = (array, key) => {
 }
 // ==================================
 
-const notif = (message = '', icon = false) => {
-    $(function () {
-        'use strict';
-        resetToastPosition();
-        $.toast({
-            heading: 'Notifikasi',
-            text: message,
-            showHideTransition: 'plain',
-            position: 'top-right',
-            icon: icon,
-            stack: false,
-            loader: false,
-            loaderBg: '#57c7d4',
-        })
+let activeNotification = null;
+let deletionConfirmationPending = false;
+
+const confirmDelete = (message = 'Hapus data ini?') => {
+    if (deletionConfirmationPending) return Promise.resolve(false);
+    deletionConfirmationPending = true;
+    const element = document.getElementById('delete-confirmation');
+    const button = document.getElementById('delete-confirmation-submit');
+    document.getElementById('delete-confirmation-message').textContent = message;
+    const modal = bootstrap.Modal.getInstance(element) || new bootstrap.Modal(element);
+    return new Promise(resolve => {
+        let confirmed = false;
+        const approve = () => {
+            confirmed = true;
+            button.disabled = true;
+            modal.hide();
+        };
+        button.addEventListener('click', approve);
+        element.addEventListener('hidden.bs.modal', () => {
+            button.removeEventListener('click', approve);
+            button.disabled = false;
+            deletionConfirmationPending = false;
+            resolve(confirmed);
+        }, { once: true });
+        modal.show();
     });
-}
+};
+let notificationTimer = null;
 
-const resetToastPosition = () => {
-    $('.jq-toast-wrap').removeClass('bottom-left bottom-right top-left top-right mid-center'); // to remove previous position class
-    $(".jq-toast-wrap").css({
-        "top": "",
-        "left": "",
-        "bottom": "",
-        "right": ""
-    }); //to remove previous position style
-}
+const notif = (message = '', icon = 'info') => {
+    const types = { success: 'success', info: 'info', warning: 'warning', danger: 'danger', error: 'danger' };
+    const type = types[icon] || 'info';
+    window.clearTimeout(notificationTimer);
+    if (activeNotification) activeNotification.remove();
+    const toast = document.createElement('div');
+    toast.className = 'app-toast app-toast-' + type;
+    toast.setAttribute('role', type === 'danger' || type === 'warning' ? 'alert' : 'status');
+    const text = document.createElement('span');
+    text.textContent = Array.isArray(message) ? message.join(' ') : String(message);
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'btn-close';
+    close.setAttribute('aria-label', 'Tutup notifikasi');
+    toast.append(text, close);
+    (document.fullscreenElement || document.body).appendChild(toast);
+    activeNotification = toast;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (toast.isConnected) toast.classList.add('is-visible');
+        });
+    });
+    const dismiss = () => {
+        if (activeNotification === toast) window.clearTimeout(notificationTimer);
+        toast.classList.remove('is-visible');
+        window.setTimeout(() => toast.remove(), 160);
+    };
+    close.addEventListener('click', dismiss);
+    notificationTimer = window.setTimeout(dismiss, type === 'success' ? 2500 : 5000);
+};
 
-// Request to server
+document.addEventListener('DOMContentLoaded', () => {
+    const messages = [];
+    document.querySelectorAll('.alert-success, .alert-info, .alert-warning, .alert-danger').forEach(element => {
+        if (!element.classList.contains('alert') || element.querySelector('input, textarea, select')) return;
+        const type = ['success', 'info', 'warning', 'danger'].find(value => element.classList.contains('alert-' + value));
+        const content = element.cloneNode(true);
+        content.querySelectorAll('button, .btn-close').forEach(button => button.remove());
+        messages.push({ message: content.textContent.trim(), type });
+        element.remove();
+    });
+    if (messages.length) {
+        const priority = { info: 0, success: 1, warning: 2, danger: 3 };
+        const type = messages.reduce((result, item) => priority[item.type] > priority[result] ? item.type : result, 'info');
+        notif(messages.map(item => item.message).join(' '), type);
+    }
+});
 const requestServer = ({ url = '', type = 'post', data = [], onLoader = true, onSuccess }) => {
     $.ajax({
         url: url,
