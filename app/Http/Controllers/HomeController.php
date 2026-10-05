@@ -33,8 +33,8 @@ class HomeController extends Controller
     {
         $today = Carbon::today();
         $now = Carbon::now();
-        $personnelCount = User::where('role', '!=', 1)->count();
-        $attendanceToday = AbsensiModel::personnel()->whereDate('created_at', $today)
+        $personnelCount = User::count();
+        $attendanceToday = AbsensiModel::whereDate('created_at', $today)
             ->distinct('user_id')
             ->count('user_id');
 
@@ -57,14 +57,14 @@ class HomeController extends Controller
 
             return [
                 'label' => $date->locale('id')->isoFormat('ddd, D MMM'),
-                'total' => AbsensiModel::personnel()->whereDate('created_at', $date)
+                'total' => AbsensiModel::whereDate('created_at', $date)
                     ->distinct('user_id')
                     ->count('user_id'),
             ];
         });
 
         $roleLabels = RoleModel::pluck('role', 'key');
-        $personnelByRole = User::where('role', '!=', 1)
+        $personnelByRole = User::query()
             ->selectRaw('role, COUNT(*) as total')
             ->groupBy('role')
             ->orderBy('role')
@@ -92,7 +92,7 @@ class HomeController extends Controller
             'activePermits' => $activePermits,
             'attendanceTrend' => $attendanceTrend,
             'personnelByRole' => $personnelByRole,
-            'recentAttendances' => AbsensiModel::personnel()->with('userModel:id,name,pangkat')
+            'recentAttendances' => AbsensiModel::with('userModel:id,name,pangkat')
                 ->latest('created_at')
                 ->limit(6)
                 ->get(),

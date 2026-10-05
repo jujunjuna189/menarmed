@@ -3285,3 +3285,7 @@ Stack trace:
 [2026-10-05 11:55:38] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-05 11:55:40] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/perizinan","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-05 11:57:44] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:58:15] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:58:45] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:59:27] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 12:03:51] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 

@@ -19,9 +19,6 @@ class ReportController extends Controller
     private function reportQuery(string $model, Request $request, ?int $defaultLimit = null)
     {
         $query = $model::orderBy('id', 'desc');
-        if ($model === AbsensiModel::class) {
-            $query->personnel();
-        }
         if ($request->filled('user_id') && $model !== SaranModel::class) {
             $request->validate(['user_id' => 'required|integer|min:1']);
             $query->where('user_id', $request->input('user_id'));

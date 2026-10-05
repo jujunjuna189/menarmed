@@ -10,14 +10,14 @@ class MonthlyAttendance
 {
     public static function people(string $search)
     {
-        return User::where('role', '!=', 1)->when($search !== '', function ($query) use ($search) {
+        return User::query()->when($search !== '', function ($query) use ($search) {
             $query->where('name', 'like', '%' . $search . '%');
         })->orderBy('name')->orderBy('id');
     }
 
     public static function records(Carbon $month, $ids)
     {
-        return AbsensiModel::personnel()->whereIn('user_id', $ids)
+        return AbsensiModel::whereIn('user_id', $ids)
             ->where('created_at', '>=', $month->copy()->startOfMonth())
             ->where('created_at', '<', $month->copy()->startOfMonth()->addMonth())
             ->orderBy('created_at')->orderBy('id')->get()

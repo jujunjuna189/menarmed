@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class AttendancePersonnelFilterTest extends TestCase
 {
-    public function test_admin_attendance_is_excluded_from_reports_and_live_monitor(): void
+    public function test_all_roles_are_included_in_reports_and_live_monitor(): void
     {
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
         DB::purge('sqlite');
@@ -32,12 +32,12 @@ class AttendancePersonnelFilterTest extends TestCase
         foreach ([1, 2, 3] as $id) {
             DB::table('absensi')->insert(['user_id' => $id, 'ket' => 'Hadir', 'created_at' => now(), 'updated_at' => now()]);
         }
-        $this->assertSame(2, AbsensiModel::personnel()->count());
+        $this->assertSame(3, AbsensiModel::count());
         $report = (new ReportController())->absensi(Request::create('/', 'POST', ['page' => 1]))->getData(true);
-        $this->assertSame(2, $report['pagination']['total']);
-        $this->assertSame(['Petugas', 'Personel'], array_column($report['data'], 'user_name'));
+        $this->assertSame(3, $report['pagination']['total']);
+        $this->assertSame(['Petugas', 'Personel', 'Admin'], array_column($report['data'], 'user_name'));
         $monitor = (new AbsensiController())->showTodayPresence()->getData(true);
-        $this->assertCount(2, $monitor['data']['today_presence']);
-        $this->assertNotContains(1, array_column($monitor['data']['today_presence'], 'user_id'));
+        $this->assertCount(3, $monitor['data']['today_presence']);
+        $this->assertContains(1, array_map('intval', array_column($monitor['data']['today_presence'], 'user_id')));
     }
 }
