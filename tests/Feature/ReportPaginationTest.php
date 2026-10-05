@@ -15,6 +15,11 @@ class ReportPaginationTest extends TestCase
     {
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
         DB::purge('sqlite');
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->integer('role');
+        });
+        DB::table('users')->insert([['id' => 7, 'role' => 3], ['id' => 8, 'role' => 1]]);
         Schema::create('absensi', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('user_id');

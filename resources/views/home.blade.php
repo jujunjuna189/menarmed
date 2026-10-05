@@ -5,7 +5,7 @@
         <h2 class="page-title mb-1">Ringkasan Operasional</h2>
         <div class="text-muted">Data personel dan aktivitas satuan hari ini</div>
     </div>
-    <div class="text-muted small mt-2 mt-md-0">
+    <div id="dashboard-updated" class="text-muted small mt-2 mt-md-0">
         Diperbarui {{ $updatedAt->locale('id')->isoFormat('D MMMM YYYY, HH:mm') }}
     </div>
 </div>
@@ -20,7 +20,7 @@
                     </span>
                     <div>
                         <div class="text-muted small">Total Personel</div>
-                        <div class="h1 mb-0">{{ number_format($summary['personnel']) }}</div>
+                        <div class="h1 mb-0" data-summary="personnel">{{ number_format($summary['personnel']) }}</div>
                     </div>
                 </div>
             </div>
@@ -36,8 +36,8 @@
                     <div class="flex-fill">
                         <div class="text-muted small">Hadir Hari Ini</div>
                         <div class="d-flex align-items-baseline gap-2">
-                            <div class="h1 mb-0">{{ number_format($summary['attendance_today']) }}</div>
-                            <span class="text-green small">{{ $summary['attendance_rate'] }}%</span>
+                            <div class="h1 mb-0" data-summary="attendance_today">{{ number_format($summary['attendance_today']) }}</div>
+                            <span class="text-green small" data-summary="attendance_rate">{{ $summary['attendance_rate'] }}%</span>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                     </span>
                     <div>
                         <div class="text-muted small">Izin Aktif</div>
-                        <div class="h1 mb-0">{{ number_format($summary['active_permits']) }}</div>
+                        <div class="h1 mb-0" data-summary="active_permits">{{ number_format($summary['active_permits']) }}</div>
                     </div>
                 </div>
             </div>
@@ -68,7 +68,7 @@
                     </span>
                     <div>
                         <div class="text-muted small">Saran Bulan Ini</div>
-                        <div class="h1 mb-0">{{ number_format($summary['suggestions_this_month']) }}</div>
+                        <div class="h1 mb-0" data-summary="suggestions_this_month">{{ number_format($summary['suggestions_this_month']) }}</div>
                     </div>
                 </div>
             </div>
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const chartTextColor = '#626976';
     const gridColor = '#e6e7e9';
 
-    new ApexCharts(document.querySelector('#attendance-trend-chart'), {
+    const attendanceChart = new ApexCharts(document.querySelector('#attendance-trend-chart'), {
         chart: { type: 'area', height: 300, toolbar: { show: false }, animations: { enabled: false } },
         series: [{ name: 'Personel hadir', data: attendanceTrend.map(item => item.total) }],
         xaxis: { categories: attendanceTrend.map(item => item.label), labels: { style: { colors: chartTextColor } } },
@@ -180,9 +180,9 @@ document.addEventListener('DOMContentLoaded', function () {
         dataLabels: { enabled: false },
         grid: { borderColor: gridColor, strokeDashArray: 4 },
         tooltip: { y: { formatter: value => value + ' personel' } }
-    }).render();
+    });
 
-    new ApexCharts(document.querySelector('#permit-chart'), {
+    const permitChart = new ApexCharts(document.querySelector('#permit-chart'), {
         chart: { type: 'donut', height: 300 },
         series: Object.values(activePermits),
         labels: Object.keys(activePermits),
@@ -191,9 +191,9 @@ document.addEventListener('DOMContentLoaded', function () {
         dataLabels: { enabled: false },
         noData: { text: 'Tidak ada izin aktif' },
         plotOptions: { pie: { donut: { size: '68%', labels: { show: true, total: { show: true, label: 'Total' } } } } }
-    }).render();
+    });
 
-    new ApexCharts(document.querySelector('#personnel-chart'), {
+    const personnelChart = new ApexCharts(document.querySelector('#personnel-chart'), {
         chart: { type: 'bar', height: 300, toolbar: { show: false } },
         series: [{ name: 'Personel', data: personnelByRole.map(item => item.total) }],
         xaxis: { categories: personnelByRole.map(item => item.label), labels: { style: { colors: chartTextColor } } },
@@ -203,7 +203,54 @@ document.addEventListener('DOMContentLoaded', function () {
         dataLabels: { enabled: false },
         grid: { borderColor: gridColor, strokeDashArray: 4 },
         tooltip: { y: { formatter: value => value + ' personel' } }
-    }).render();
+    });
+    const chartsReady = Promise.all([attendanceChart.render(), permitChart.render(), personnelChart.render()]);
+    let refreshing = false;
+    async function refreshStatistics() {
+        if (document.hidden || refreshing) return;
+        refreshing = true;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        try {
+            const response = await fetch(@json(route('home')), {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                cache: 'no-store',
+                signal: controller.signal
+            });
+            if (!response.ok || response.redirected) return;
+            const data = await response.json();
+            await chartsReady;
+            document.querySelectorAll('[data-summary]').forEach(element => {
+                const key = element.dataset.summary;
+                element.textContent = key === 'attendance_rate'
+                    ? data.summary[key] + '%'
+                    : Number(data.summary[key]).toLocaleString();
+            });
+            await Promise.all([
+                attendanceChart.updateOptions({
+                    series: [{ name: 'Personel hadir', data: data.attendanceTrend.map(item => item.total) }],
+                    xaxis: { categories: data.attendanceTrend.map(item => item.label) }
+                }),
+                permitChart.updateOptions({ series: Object.values(data.activePermits), labels: Object.keys(data.activePermits) }),
+                personnelChart.updateOptions({
+                    series: [{ name: 'Personel', data: data.personnelByRole.map(item => item.total) }],
+                    xaxis: { categories: data.personnelByRole.map(item => item.label) }
+                })
+            ]);
+            document.querySelector('#dashboard-updated').textContent = 'Diperbarui ' + data.updatedAt;
+        } catch (_) {
+            // Preserve the last successful statistics on network errors.
+        } finally {
+            clearTimeout(timeout);
+            refreshing = false;
+        }
+    }
+    const interval = setInterval(refreshStatistics, 30000);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) refreshStatistics();
+    });
+    window.addEventListener('pagehide', () => clearInterval(interval), { once: true });
 });
 </script>
 @endpush

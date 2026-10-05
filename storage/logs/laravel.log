@@ -3237,3 +3237,51 @@ Stack trace:
 [2026-10-05 01:07:10] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/qrcode","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-05 01:07:14] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/qrcode/5/print","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-05 01:23:14] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/qrcode/9/print","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 09:56:16] local.ERROR: Writing to /Users/user/.config/psysh/psysh_history is not allowed. {"exception":"[object] (ErrorException(code: 0): Writing to /Users/user/.config/psysh/psysh_history is not allowed. at /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/ConfigPaths.php:386)
+[stacktrace]
+#0 [internal function]: Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(1024, 'Writing to /Use...', '/Users/user/Doc...', 386, Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/ConfigPaths.php(386): trigger_error('Writing to /Use...', 1024)
+#2 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Configuration.php(631): Psy\\ConfigPaths::touchFileWithMkdir('/Users/user/.co...')
+#3 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Configuration.php(656): Psy\\Configuration->setHistoryFile('/Users/user/.co...')
+#4 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Configuration.php(796): Psy\\Configuration->getHistoryFile()
+#5 /Users/user/Documents/quict/menarmed/vendor/psy/psysh/src/Shell.php(92): Psy\\Configuration->getReadline()
+#6 /Users/user/Documents/quict/menarmed/vendor/laravel/tinker/src/Console/TinkerCommand.php(55): Psy\\Shell->__construct(Object(Psy\\Configuration))
+#7 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#8 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Util.php(40): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#9 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#10 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(37): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#11 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Container/Container.php(653): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#12 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(136): Illuminate\\Container\\Container->call(Array)
+#13 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Command/Command.php(298): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#14 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Command.php(121): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#15 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(1024): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#16 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(299): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 /Users/user/Documents/quict/menarmed/vendor/symfony/console/Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Console/Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#19 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#20 /Users/user/Documents/quict/menarmed/artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#21 {main}
+"} 
+[2026-10-05 09:56:32] local.ERROR: Uncaught PDOException: SQLSTATE[HY000] [2002] Operation not permitted in /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:70
+Stack trace:
+#0 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(70): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(46): Illuminate\Database\Connectors\Connector->createPdoConnection('mysql:host=127....', 'root', '', Array)
+#2 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\Database\Connectors\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\Database\Connectors\MySqlConnector->connect(Array)
+#4 [internal fun {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught PDOException: SQLSTATE[HY000] [2002] Operation not permitted in /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:70
+Stack trace:
+#0 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(70): PDO->__construct('mysql:host=127....', 'root', '', Array)
+#1 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php(46): Illuminate\\Database\\Connectors\\Connector->createPdoConnection('mysql:host=127....', 'root', '', Array)
+#2 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/MySqlConnector.php(24): Illuminate\\Database\\Connectors\\Connector->createConnection('mysql:host=127....', Array, Array)
+#3 /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connectors/ConnectionFactory.php(184): Illuminate\\Database\\Connectors\\MySqlConnector->connect(Array)
+#4 [internal fun at /Users/user/Documents/quict/menarmed/vendor/laravel/framework/src/Illuminate/Database/Connection.php:712)
+[stacktrace]
+#0 {main}
+"} 
+[2026-10-05 11:53:38] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:54:08] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:54:38] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:55:08] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:55:38] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:55:40] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/report/perizinan","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-05 11:57:44] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/home","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 

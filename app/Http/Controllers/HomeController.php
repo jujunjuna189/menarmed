@@ -10,6 +10,7 @@ use App\Models\RoleModel;
 use App\Models\SaranModel;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -28,15 +29,12 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         $today = Carbon::today();
         $now = Carbon::now();
         $personnelCount = User::where('role', '!=', 1)->count();
-        $attendanceToday = AbsensiModel::whereDate('created_at', $today)
-            ->whereHas('userModel', function ($query) {
-                $query->where('role', '!=', 1);
-            })
+        $attendanceToday = AbsensiModel::personnel()->whereDate('created_at', $today)
             ->distinct('user_id')
             ->count('user_id');
 
@@ -59,10 +57,7 @@ class HomeController extends Controller
 
             return [
                 'label' => $date->locale('id')->isoFormat('ddd, D MMM'),
-                'total' => AbsensiModel::whereDate('created_at', $date)
-                    ->whereHas('userModel', function ($query) {
-                        $query->where('role', '!=', 1);
-                    })
+                'total' => AbsensiModel::personnel()->whereDate('created_at', $date)
                     ->distinct('user_id')
                     ->count('user_id'),
             ];
@@ -81,7 +76,7 @@ class HomeController extends Controller
                 ];
             });
 
-        return view('home', [
+        $data = [
             'summary' => [
                 'personnel' => $personnelCount,
                 'attendance_today' => $attendanceToday,
@@ -97,11 +92,21 @@ class HomeController extends Controller
             'activePermits' => $activePermits,
             'attendanceTrend' => $attendanceTrend,
             'personnelByRole' => $personnelByRole,
-            'recentAttendances' => AbsensiModel::with('userModel:id,name,pangkat')
+            'recentAttendances' => AbsensiModel::personnel()->with('userModel:id,name,pangkat')
                 ->latest('created_at')
                 ->limit(6)
                 ->get(),
             'updatedAt' => $now,
-        ]);
+        ];
+        if ($request->expectsJson()) {
+            return response()->json([
+                'summary' => $data['summary'],
+                'activePermits' => $activePermits,
+                'attendanceTrend' => $attendanceTrend,
+                'personnelByRole' => $personnelByRole,
+                'updatedAt' => $now->locale('id')->isoFormat('D MMMM YYYY, HH:mm:ss'),
+            ]);
+        }
+        return view('home', $data);
     }
 }

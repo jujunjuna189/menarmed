@@ -80,7 +80,7 @@ class ReportController extends Controller
         $endDate = $request->get('end_date', date('Y-m-t'));
         $search = $request->get('filter', []);
 
-        $query = AbsensiModel::with('userModel')
+        $query = AbsensiModel::personnel()->with('userModel')
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->whereHas('userModel', function($q) use ($search) {
                 if (isset($search['name'])) {
