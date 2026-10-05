@@ -14,7 +14,7 @@ class AbsensiController extends Controller
     {
         $pageSize = $request->input('page.size', 10);
         $currentPage = $request->input('page.number', 1);
-        $userQuery = User::query()->where('role', '!=', 1)->select('id', 'name', 'pangkat');
+        $userQuery = User::query()->select('id', 'name', 'pangkat');
 
         $data['user'] = QueryBuilder::for(clone $userQuery)
             ->allowedFilters(['name'])
@@ -36,7 +36,7 @@ class AbsensiController extends Controller
 
     public function track_maps()
     {
-        $data['user'] = User::where('role', '!=', 1)
+        $data['user'] = User::query()
             ->select('id', 'name', 'pangkat')
             ->orderBy('name')
             ->get();

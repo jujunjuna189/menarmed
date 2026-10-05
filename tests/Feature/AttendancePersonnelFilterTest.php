@@ -39,5 +39,14 @@ class AttendancePersonnelFilterTest extends TestCase
         $monitor = (new AbsensiController())->showTodayPresence()->getData(true);
         $this->assertCount(3, $monitor['data']['today_presence']);
         $this->assertContains(1, array_map('intval', array_column($monitor['data']['today_presence'], 'user_id')));
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('pangkat')->nullable();
+        });
+        $controller = new \App\Http\Controllers\Admin\Absensi\AbsensiController();
+        $view = $controller->index(Request::create('/', 'GET'));
+        $this->assertSame(3, $view->getData()['user']->total());
+        $this->assertContains('1', $view->getData()['userIds']->all());
+        $map = $controller->track_maps();
+        $this->assertCount(3, $map->getData()['user']);
     }
 }
