@@ -45,7 +45,7 @@
         </a>
     </div>
     <div class="col-sm-6 col-xl-3">
-        <a href="{{ route('report.perizinan') }}" class="card card-link text-reset">
+        <div class="card">
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <span class="avatar bg-yellow-lt text-yellow me-3">
@@ -57,7 +57,7 @@
                     </div>
                 </div>
             </div>
-        </a>
+        </div>
     </div>
     <div class="col-sm-6 col-xl-3">
         <a href="{{ route('saran') }}" class="card card-link text-reset">
@@ -92,11 +92,14 @@
     </div>
     <div class="col-lg-4">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center justify-content-between gap-2">
                 <div>
                     <h3 class="card-title">Izin Aktif</h3>
                     <div class="text-muted small">Berdasarkan kategori perizinan</div>
                 </div>
+                <a href="{{ route('home.active-permits') }}" class="btn btn-sm btn-outline-secondary">
+                    Lihat data <span aria-hidden="true" class="ms-1">&rarr;</span>
+                </a>
             </div>
             <div class="card-body">
                 <div id="permit-chart" class="chart-lg"></div>

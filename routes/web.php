@@ -29,6 +29,7 @@ Route::get('/artikel/view', [App\Http\Controllers\Admin\Artikel\ArtikelControlle
 
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/home/izin-aktif', [App\Http\Controllers\HomeController::class, 'activePermits'])->name('home.active-permits');
     Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/log-viewer', [App\Http\Controllers\Admin\LogViewerController::class, 'index'])->name('log-viewer.index');

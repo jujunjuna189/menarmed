@@ -109,4 +109,29 @@ class HomeController extends Controller
         }
         return view('home', $data);
     }
+
+    public function activePermits(Request $request)
+    {
+        $now = Carbon::now();
+        $combined = null;
+        foreach ([
+            'Personel' => PerizinanModel::class,
+            'Ranpur' => PerizinanRanpurModel::class,
+            'Angkutan' => PerizinanKendaraanModel::class,
+        ] as $category => $model) {
+            $table = (new $model())->getTable();
+            $query = $model::query()
+                ->leftJoin('users', 'users.id', '=', $table . '.user_id')
+                ->where($table . '.keluar', '<=', $now)
+                ->where(function ($query) use ($table, $now) {
+                    $query->whereNull($table . '.masuk')->orWhere($table . '.masuk', '>', $now);
+                })
+                ->select($table . '.id', 'users.name', $table . '.keluar', $table . '.masuk', $table . '.tujuan', $table . '.jenis_kendaraan')
+                ->selectRaw('? as category', [$category]);
+            $combined = $combined ? $combined->unionAll($query) : $query;
+        }
+        $permits = $combined->orderBy('keluar', 'desc')->orderBy('category')->orderBy('id', 'desc')
+            ->paginate(10)->withQueryString();
+        return view('active_permits', compact('permits'));
+    }
 }
