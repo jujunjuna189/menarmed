@@ -95,3 +95,8 @@ Route::post('/setting/slider/delete', [App\Http\Controllers\Api\Pengaturan\Slide
 Route::post('/feature/slider/show', [App\Http\Controllers\Api\Pengaturan\SliderController::class, 'show']);
 // Marquee
 Route::post('/feature/marquee/show', [App\Http\Controllers\Api\Pengaturan\TextMarqueeController::class, 'show']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/push-device', [App\Http\Controllers\Api\PushDeviceController::class, 'store']);
+    Route::delete('/push-device', [App\Http\Controllers\Api\PushDeviceController::class, 'destroy']);
+});

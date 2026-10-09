@@ -28,7 +28,15 @@ class AlarmPushService
         });
     }
 
-    public function send(bool $status, int $code): bool
+    public function status(): array
+    {
+        $credentials = json_decode(file_get_contents(config('firebase.credentials')), true, 512, JSON_THROW_ON_ERROR);
+        if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') throw new RuntimeException('Firebase project mismatch');
+        return Http::withToken($this->token($credentials))->timeout(15)
+            ->get(rtrim(config('firebase.database_url'), '/') . '/alarm/demo.json')->throw()->json() ?? [];
+    }
+
+    public function send(bool $status, int $code, bool $siren = true): bool
     {
         $credentials = json_decode(file_get_contents(config('firebase.credentials')), true, 512, JSON_THROW_ON_ERROR);
         if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') throw new RuntimeException('Firebase project mismatch');
@@ -37,6 +45,8 @@ class AlarmPushService
         $levels = ['Siaga Tingkat I', 'Siaga Tingkat II', 'Siaga Tingkat III', 'Pencabutan Siaga', 'Siap Digerakan Sewaktu Waktu'];
         Http::withToken($token)->timeout(15)->put(rtrim(config('firebase.database_url'), '/') . '/alarm/demo.json', [
             'status' => $status, 'alarm' => $names[$code], 'code' => $code,
+            'siren' => $siren,
+            'started_at' => $status ? (int) round(microtime(true) * 1000) : null,
         ])->throw();
         if (!$status) return true;
         try {
@@ -45,10 +55,10 @@ class AlarmPushService
             ['message' => [
                 'topic' => 'stelling_alarm',
                 'notification' => ['title' => $names[$code], 'body' => $levels[$code]],
-                'data' => ['type' => 'stelling_alarm', 'code' => (string) $code],
+                'data' => ['type' => 'stelling_alarm', 'code' => (string) $code, 'siren' => $siren ? '1' : '0'],
                 'android' => [
                     'priority' => 'high', 'ttl' => '60s',
-                    'notification' => ['channel_id' => 'stelling_siren_v1', 'sound' => 'alarm', 'tag' => 'stelling_alarm'],
+                    'notification' => ['channel_id' => $siren ? 'stelling_siren_v1' : 'menarmed_messages_v1', 'sound' => $siren ? 'alarm' : 'default', 'tag' => 'stelling_alarm'],
                 ],
             ]]
         )->throw();
@@ -59,21 +69,30 @@ class AlarmPushService
         }
     }
 
+    public function broadcast(string $title, string $body, bool $siren = false): void
+    {
+        $this->sendMessage(['topic' => 'menarmed_all'], $title, $body, $siren);
+    }
+
     public function testDevice(string $deviceToken, string $title, string $body, bool $siren = false): void
+    {
+        $this->sendMessage(['token' => $deviceToken], $title, $body, $siren);
+    }
+
+    private function sendMessage(array $target, string $title, string $body, bool $siren): void
     {
         $credentials = json_decode(file_get_contents(config('firebase.credentials')), true, 512, JSON_THROW_ON_ERROR);
         if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') throw new RuntimeException('Firebase project mismatch');
         Http::withToken($this->token($credentials))->timeout(15)->post(
             'https://fcm.googleapis.com/v1/projects/' . $credentials['project_id'] . '/messages:send',
-            ['message' => [
-                'token' => $deviceToken,
+            ['message' => array_merge($target, [
                 'notification' => ['title' => $title, 'body' => $body],
                 'data' => ['type' => 'push_message', 'title' => $title, 'body' => $body, 'siren' => $siren ? '1' : '0'],
                 'android' => [
                     'priority' => 'high', 'ttl' => '60s',
                     'notification' => ['channel_id' => $siren ? 'stelling_siren_v1' : 'menarmed_messages_v1', 'sound' => $siren ? 'alarm' : 'default'],
                 ],
-            ]]
+            ])]
         )->throw();
     }
 }

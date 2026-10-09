@@ -29,6 +29,8 @@ Route::get('/artikel/view', [App\Http\Controllers\Admin\Artikel\ArtikelControlle
 
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/push-test/alarm', [App\Http\Controllers\Api\AlarmController::class, 'status'])->name('push-test.alarm.status');
+    Route::post('/push-test/alarm', [App\Http\Controllers\Api\AlarmController::class, 'store'])->name('push-test.alarm.store');
     Route::get('/push-test', [App\Http\Controllers\PushTestController::class, 'index'])->name('push-test');
     Route::post('/push-test', [App\Http\Controllers\PushTestController::class, 'send'])->middleware('throttle:5,1')->name('push-test.send');
     Route::get('/home/izin-aktif', [App\Http\Controllers\HomeController::class, 'activePermits'])->name('home.active-permits');
