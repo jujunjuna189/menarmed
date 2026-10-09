@@ -79,4 +79,17 @@ class AlarmPushTest extends TestCase
         $request->setUserResolver(function () { return (object) ['role' => 1]; });
         $this->assertSame(200, (new AlarmController)->store($request, $service)->getStatusCode());
     }
+
+    public function test_status_failure_logs_safe_diagnostics_without_exposing_secret(): void
+    {
+        $service = \Mockery::mock(AlarmPushService::class);
+        $service->shouldReceive('status')->once()->andThrow(new \RuntimeException('secret-private-key'));
+        \Illuminate\Support\Facades\Log::shouldReceive('warning')->once()
+            ->with('Firebase alarm failed', ['operation' => 'status', 'exception' => \RuntimeException::class]);
+        $request = Request::create('/', 'GET');
+        $request->setUserResolver(function () { return (object) ['role' => 1]; });
+        $response = (new AlarmController)->status($request, $service);
+        $this->assertSame(502, $response->getStatusCode());
+        $this->assertStringNotContainsString('secret-private-key', $response->getContent());
+    }
 }
