@@ -8,6 +8,24 @@ use RuntimeException;
 
 class AlarmPushService
 {
+    private function credentials(): array
+    {
+        $path = config('firebase.credentials');
+        if (!is_string($path) || !is_file($path) || !is_readable($path)) {
+            throw new RuntimeException('Firebase credentials file missing or unreadable');
+        }
+        $credentials = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+        if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') {
+            throw new RuntimeException('Firebase project mismatch');
+        }
+        foreach (['client_email', 'private_key'] as $field) {
+            if (empty($credentials[$field]) || !is_string($credentials[$field])) {
+                throw new RuntimeException('Firebase credentials incomplete');
+            }
+        }
+        return $credentials;
+    }
+
     private function token(array $credentials): string
     {
         return Cache::remember('firebase_alarm_oauth_' . $credentials['client_email'], 3000, function () use ($credentials) {
@@ -30,16 +48,14 @@ class AlarmPushService
 
     public function status(): array
     {
-        $credentials = json_decode(file_get_contents(config('firebase.credentials')), true, 512, JSON_THROW_ON_ERROR);
-        if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') throw new RuntimeException('Firebase project mismatch');
+        $credentials = $this->credentials();
         return Http::withToken($this->token($credentials))->timeout(15)
             ->get(rtrim(config('firebase.database_url'), '/') . '/alarm/demo.json')->throw()->json() ?? [];
     }
 
     public function send(bool $status, int $code, bool $siren = true): bool
     {
-        $credentials = json_decode(file_get_contents(config('firebase.credentials')), true, 512, JSON_THROW_ON_ERROR);
-        if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') throw new RuntimeException('Firebase project mismatch');
+        $credentials = $this->credentials();
         $token = $this->token($credentials);
         $names = ['Awan Jingga', 'Awan Kuning', 'Awan Biru', 'Angin Gunung', 'Angin Puyuh'];
         $levels = ['Siaga Tingkat I', 'Siaga Tingkat II', 'Siaga Tingkat III', 'Pencabutan Siaga', 'Siap Digerakan Sewaktu Waktu'];
@@ -81,8 +97,7 @@ class AlarmPushService
 
     private function sendMessage(array $target, string $title, string $body, bool $siren): void
     {
-        $credentials = json_decode(file_get_contents(config('firebase.credentials')), true, 512, JSON_THROW_ON_ERROR);
-        if (($credentials['project_id'] ?? '') !== 'menarmed-708d2') throw new RuntimeException('Firebase project mismatch');
+        $credentials = $this->credentials();
         Http::withToken($this->token($credentials))->timeout(15)->post(
             'https://fcm.googleapis.com/v1/projects/' . $credentials['project_id'] . '/messages:send',
             ['message' => array_merge($target, [

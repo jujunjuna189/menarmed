@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\AlarmPushService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class PushTestController extends Controller
@@ -35,6 +36,7 @@ class PushTestController extends Controller
                 $service->broadcast($data['title'], $data['body'], $request->boolean('siren'));
                 return redirect()->route('push-test')->with('success', 'Pesan diterima FCM untuk dikirim ke semua aplikasi yang mengikuti notifikasi umum.');
             } catch (\Throwable $error) {
+                $this->logPushFailure($error, 'topic');
                 return redirect()->route('push-test')->withInput($request->only('recipient_id', 'title', 'body', 'siren'))
                     ->with('error', 'Pengiriman ke semua aplikasi gagal. Periksa koneksi dan konfigurasi Firebase server.');
             }
@@ -49,6 +51,7 @@ class PushTestController extends Controller
                 $service->testDevice($token, $data['title'], $data['body'], $request->boolean('siren'));
                 $sent++;
             } catch (\Throwable $error) {
+                $this->logPushFailure($error, 'device');
                 // Continue so one unavailable device does not prevent the others from receiving the message.
             }
         }
@@ -59,4 +62,17 @@ class PushTestController extends Controller
         return $response->withInput($request->only('recipient_id', 'title', 'body', 'siren'))
             ->with('error', "FCM menerima pesan untuk {$sent} dari {$tokens->count()} perangkat. Periksa koneksi server, kredensial Firebase, atau minta penerima membuka kembali aplikasi. Mengirim ulang dapat membuat notifikasi ganda pada perangkat yang sudah berhasil.");
     }
+    private function logPushFailure(\Throwable $error, string $target): void
+    {
+        $context = ['target' => $target, 'exception' => get_class($error)];
+        if ($error instanceof \Illuminate\Http\Client\RequestException) {
+            $context['http_status'] = $error->response->status();
+            $status = $error->response->json('error.status');
+            if (is_string($status) && preg_match('/^[A-Z_]{1,80}$/', $status)) {
+                $context['firebase_status'] = $status;
+            }
+        }
+        Log::warning('Firebase push failed', $context);
+    }
 }
+

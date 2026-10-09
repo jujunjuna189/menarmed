@@ -3511,3 +3511,6 @@ Stack trace:
 [2026-10-09 23:29:16] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/push-test/alarm","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-09 23:29:18] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/qrcode","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
 [2026-10-09 23:29:24] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/layanan-public","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-09 23:38:59] local.INFO: Cek role middleware {"url":"http://127.0.0.1:8000/layanan-public","method":"GET","auth_check":true,"auth_id":1,"auth_email":"adminsuper","auth_role":1,"allowed_roles":["1"]} 
+[2026-10-10 00:13:16] testing.WARNING: Firebase push failed {"target":"device","exception":"RuntimeException"} 
+[2026-10-10 00:13:16] testing.WARNING: Firebase push failed {"target":"topic","exception":"RuntimeException"} 
