@@ -177,20 +177,55 @@ class PenggunaController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Pengguna berhasil diperbarui.']);
     }
 
+    public function resetPasswordOptions(Request $request)
+    {
+        $data = $request->validate(['role' => ['required', 'integer', 'in:1,3']]);
+        return response()->json(['data' => User::where('role', $data['role'])->orderBy('name')->orderBy('id')->get(['id', 'name', 'email'])]);
+    }
+
+    public function resetPasswords(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['required', 'integer', 'distinct'],
+        ]);
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            $users = User::whereIn('id', $data['ids'])->orderBy('id')->lockForUpdate()->get();
+            if ($users->count() !== count($data['ids']) || $users->contains(function ($user) {
+                return !in_array((int) $user->role, [1, 3], true);
+            })) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['ids' => 'Pilihan akun tidak valid. Muat ulang daftar pengguna.']);
+            }
+            foreach ($users as $user) {
+                $user->update(['password' => \Illuminate\Support\Facades\Hash::make('Password123!')]);
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Password ' . $users->count() . ' akun berhasil direset ke Password123!']);
+        });
+    }
+
+    public function resetPassword(User $user)
+    {
+        abort_unless(in_array((int) $user->role, [1, 3], true), 404);
+        $user->update(['password' => \Illuminate\Support\Facades\Hash::make('Password123!')]);
+
+        return response()->json(['status' => 'success', 'message' => 'Password berhasil direset ke Password123!']);
+    }
+
     public function destroyPersonel(User $user)
     {
         abort_unless((int) $user->role === 3, 404);
         return \Illuminate\Support\Facades\DB::transaction(function () use ($user) {
-            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            $user = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            abort_unless((int) $user->role === 3, 404);
             foreach (['absensi', 'perizinan', 'perizinan_kendaraan', 'perizinan_ranpur', 'logistik', 'gudang_senjata'] as $table) {
-                if (\Illuminate\Support\Facades\DB::table($table)->where('user_id', $user->id)->exists()) {
-                    return response()->json(['message' => 'Personel memiliki riwayat operasional dan tidak dapat dihapus.'], 422);
-                }
+                \Illuminate\Support\Facades\DB::table($table)->where('user_id', $user->id)->delete();
             }
             $user->tokens()->delete();
             \App\Models\KemampuanModel::where('user_id', $user->id)->delete();
             $user->delete();
-            return response()->json(['status' => 'success', 'message' => 'Personel berhasil dihapus.']);
+            return response()->json(['status' => 'success', 'message' => 'Personel beserta seluruh riwayatnya berhasil dihapus.']);
         });
     }
 

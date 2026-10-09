@@ -5,9 +5,6 @@
         <h2 class="page-title mb-1">Ringkasan Operasional</h2>
         <div class="text-muted">Data personel dan aktivitas satuan hari ini</div>
     </div>
-    <div id="dashboard-updated" class="text-muted small mt-2 mt-md-0">
-        Diperbarui {{ $updatedAt->locale('id')->isoFormat('D MMMM YYYY, HH:mm') }}
-    </div>
 </div>
 
 <div class="row row-deck row-cards mb-3">
@@ -241,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     xaxis: { categories: data.personnelByRole.map(item => item.label) }
                 })
             ]);
-            document.querySelector('#dashboard-updated').textContent = 'Diperbarui ' + data.updatedAt;
         } catch (_) {
             // Preserve the last successful statistics on network errors.
         } finally {

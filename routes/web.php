@@ -29,6 +29,8 @@ Route::get('/artikel/view', [App\Http\Controllers\Admin\Artikel\ArtikelControlle
 
 Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/push-test', [App\Http\Controllers\PushTestController::class, 'index'])->name('push-test');
+    Route::post('/push-test', [App\Http\Controllers\PushTestController::class, 'send'])->middleware('throttle:5,1')->name('push-test.send');
     Route::get('/home/izin-aktif', [App\Http\Controllers\HomeController::class, 'activePermits'])->name('home.active-permits');
     Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
@@ -65,10 +67,14 @@ Route::group(['middleware' => ['auth', 'role:1']], function () {
     Route::patch('/pengguna/admin/{user}', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updateAdmin'])->name('pengguna.admin.update');
     Route::patch('/pengguna/personel/{user}', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'updatePersonel'])->name('pengguna.personel.update');
     Route::delete('/pengguna/personel/{user}', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'destroyPersonel'])->name('pengguna.personel.destroy');
+    Route::post('/pengguna/{user}/reset-password', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'resetPassword'])->name('pengguna.reset-password');
+    Route::get('/pengguna/reset-password-options', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'resetPasswordOptions'])->name('pengguna.reset-password-options');
+    Route::post('/pengguna/reset-passwords', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'resetPasswords'])->name('pengguna.reset-passwords');
     Route::post('/pengguna/import', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'import'])->name('pengguna.import');
     Route::get('/pengguna/template', [App\Http\Controllers\Admin\Pengguna\PenggunaController::class, 'downloadTemplate'])->name('pengguna.template');
     // Pejabat
     Route::get('/pejabat', [App\Http\Controllers\Admin\Pejabat\PejabatController::class, 'index'])->name('pejabat');
+    Route::view('/layanan-public', 'layanan_public.index')->name('layanan-public');
     // Saran
     Route::get('/saran', [App\Http\Controllers\Admin\Saran\SaranController::class, 'index'])->name('saran');
     // Report

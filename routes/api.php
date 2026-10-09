@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Auth
+Route::middleware('auth:sanctum')->post('/alarm/store', [App\Http\Controllers\Api\AlarmController::class, 'store']);
 Route::post('/login', [App\Http\Controllers\Api\Auth\AuthController::class, 'login']);
 Route::post('/register', [App\Http\Controllers\Api\Auth\AuthController::class, 'register']);
 // Profile

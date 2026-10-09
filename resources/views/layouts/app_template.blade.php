@@ -60,6 +60,16 @@
                                 </span>
                             </a>
                         </li>
+                        @if((int) auth()->user()->role === 1)
+                        <li class="nav-item {{ request()->routeIs('push-test*') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ route('push-test') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5a2 2 0 0 1 4 0a6 6 0 0 1 4 6v3l2 3H4l2-3v-3a6 6 0 0 1 4-6"/><path d="M9 21h6"/></svg>
+                                </span>
+                                <span class="nav-link-title">Push Notifikasi</span>
+                            </a>
+                        </li>
+                        @endif
                         <hr class="my-2">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
@@ -245,6 +255,14 @@
                             </div>
                         </li>
                         <hr class="my-2">
+                        <li class="nav-item {{ request()->routeIs('layanan-public') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ route('layanan-public') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 9h1M14 9h1M9 13h1M14 13h1"/></svg>
+                                </span>
+                                <span class="nav-link-title">Layanan Public</span>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('saran') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">

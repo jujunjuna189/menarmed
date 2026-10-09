@@ -2,36 +2,42 @@
 @section('content')
 <style>
     .users-page .btn, #modal-user .btn, #modal-edit-admin .btn, #modal-import .btn { box-shadow: none !important; }
+    #reset-password-preview {
+        color: #1e293b !important;
+        -webkit-text-fill-color: #1e293b !important;
+        background-color: #f1f5f9 !important;
+        opacity: 1;
+    }
     .admin-action { width: 30px; height: 30px; padding: 0; border: 0; background: transparent; }
     .admin-menu { position: fixed !important; z-index: 1050; box-shadow: none; border: 1px solid #dce1e7; }
     .users-page .table td { padding-top: 10px; padding-bottom: 10px; }
-    .users-controls .input-icon { width: 240px; }
+    .users-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .users-heading .page-title { flex-shrink: 0; }
+    .users-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+    .users-actions .btn { min-height: 38px; white-space: nowrap; }
+    .users-filters { display: grid; grid-template-columns: minmax(200px, 1fr) 170px 120px; gap: 12px; width: 100%; }
+    .users-filters .form-control, .users-filters .form-select { min-height: 38px; }
+    .users-filter-bar { padding: 16px; border-bottom: 1px solid #dce1e7; }
+    @media (max-width: 767.98px) {
+        .users-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+        .users-actions { justify-content: flex-start; width: 100%; }
+        .users-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+        .users-filters .input-icon { grid-column: 1 / -1; }
+    }
     @media (max-width: 575.98px) {
-        .users-controls, .users-controls form { width: 100%; }
-        .users-controls .input-icon { flex: 1; width: auto; min-width: 0; }
+        .users-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .users-actions #reset-selected-passwords { grid-column: 1 / -1; }
+        .users-filter-bar { padding: 12px; }
     }
 </style>
 <div class="users-page">
-    <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-2 mb-3">
+    <div class="users-heading">
         <h2 class="page-title mb-0">{{ $role->role }}</h2>
-        <div class="users-controls d-flex flex-wrap align-items-center gap-2">
-            <form action="{{ route('pengguna') }}" method="GET" class="d-flex flex-wrap gap-2">
-                <input type="hidden" name="key" value="{{ $role->key }}">
-                <div class="input-icon">
-                    <span class="input-icon-addon"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m21 21-6-6"/></svg></span>
-                    <input type="search" name="filter[name]" value="{{ $search_name }}" class="form-control" placeholder="Cari nama pengguna" aria-label="Cari nama pengguna">
-                </div>
-                <select name="sort" class="form-select w-auto" onchange="this.form.requestSubmit()" aria-label="Urutan pengguna">
-                    @foreach(['name' => 'Nama A-Z', '-name' => 'Nama Z-A', 'email' => 'Username A-Z', '-email' => 'Username Z-A'] as $value => $label)
-                        <option value="{{ $value }}" {{ $sort === $value ? 'selected' : '' }}>{{ $label }}</option>
-                    @endforeach
-                </select>
-                <select name="page[size]" class="form-select w-auto" onchange="this.form.requestSubmit()" aria-label="Jumlah data per halaman">
-                    @foreach([10, 25, 50, 100] as $size)
-                        <option value="{{ $size }}" {{ $page_size === $size ? 'selected' : '' }}>{{ $size }} data</option>
-                    @endforeach
-                </select>
-            </form>
+        <div class="users-actions">
+
+            @if($table->aksi)
+                <button type="button" class="btn btn-outline-primary" id="reset-selected-passwords" data-bs-toggle="modal" data-bs-target="#modal-reset-passwords">Reset Password</button>
+            @endif
             @if((int) $role->key === 1)
                 <button type="button" class="btn btn-primary" onclick="openModalUser()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -50,6 +56,25 @@
         </div>
     </div>
     <div class="card">
+        <div class="users-filter-bar">
+            <form action="{{ route('pengguna') }}" method="GET" class="users-filters">
+                <input type="hidden" name="key" value="{{ $role->key }}">
+                <div class="input-icon">
+                    <span class="input-icon-addon"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m21 21-6-6"/></svg></span>
+                    <input type="search" name="filter[name]" value="{{ $search_name }}" class="form-control" placeholder="Cari nama pengguna" aria-label="Cari nama pengguna">
+                </div>
+                <select name="sort" class="form-select" onchange="this.form.requestSubmit()" aria-label="Urutan pengguna">
+                    @foreach(['name' => 'Nama A-Z', '-name' => 'Nama Z-A', 'email' => 'Username A-Z', '-email' => 'Username Z-A'] as $value => $label)
+                        <option value="{{ $value }}" {{ $sort === $value ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <select name="page[size]" class="form-select" onchange="this.form.requestSubmit()" aria-label="Jumlah data per halaman">
+                    @foreach([10, 25, 50, 100] as $size)
+                        <option value="{{ $size }}" {{ $page_size === $size ? 'selected' : '' }}>{{ $size }} data</option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
             <div class="table-responsive">
                 <table class="table card-table table-vcenter text-nowrap datatable">
                     <thead>
@@ -103,6 +128,10 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/></svg>
                                             Edit
                                         </button>
+                                        <button type="button" class="dropdown-item reset-password" data-url="{{ route('pengguna.reset-password', $val->id) }}" data-name="{{ $val->name }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
+                                            Reset Password
+                                        </button>
                                         <div class="dropdown-divider"></div>
                                         <button type="button" class="dropdown-item text-danger delete-personnel" data-url="{{ route('pengguna.personel.destroy', $val->id) }}" data-name="{{ $val->name }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6m4-6v6"/></svg>
@@ -122,6 +151,10 @@
                                         <button type="button" class="dropdown-item edit-admin" data-url="{{ route('pengguna.admin.update', $val->id) }}" data-name="{{ $val->name }}" data-email="{{ $val->email }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 3 5 5-12 12H4v-5L16 3m-2 2 5 5"/></svg>
                                             Edit
+                                        </button>
+                                        <button type="button" class="dropdown-item reset-password" data-url="{{ route('pengguna.reset-password', $val->id) }}" data-name="{{ $val->name }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
+                                            Reset Password
                                         </button>
                                         <div class="dropdown-divider"></div>
                                         <button type="button" class="dropdown-item text-danger remove-admin" data-id="{{ $val->id }}" data-name="{{ $val->name }}" @if($val->id === auth()->id()) disabled @endif>
@@ -179,6 +212,54 @@
 </div>
 @endsection
 @section('modal')
+<div class="modal fade" id="modal-confirm-reset" tabindex="-1" aria-labelledby="confirm-reset-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header py-2 px-3">
+                <h3 class="modal-title" id="confirm-reset-title">Reset password?</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body p-3">
+                <p id="confirm-reset-description" class="mb-2 text-break"></p>
+                <label for="reset-password-preview" class="form-label small mb-1">Password setelah reset</label>
+                <div class="input-group">
+                    <input id="reset-password-preview" type="text" class="form-control bg-light" style="font-family: monospace; font-weight: 600" value="Password123!" readonly autocomplete="off" spellcheck="false">
+                    <button type="button" class="btn btn-outline-secondary" id="copy-reset-password" aria-label="Salin password baru" title="Salin password">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon m-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer p-3 gap-2">
+                <button type="button" class="btn btn-outline-secondary flex-fill m-0" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary flex-fill m-0" id="confirm-reset-submit">Reset Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-reset-passwords" tabindex="-1" aria-labelledby="reset-passwords-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="reset-passwords-title">Reset Password {{ $role->role }}</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Pilih akun yang akan direset ke <strong>Password123!</strong>.</p>
+                <input type="search" id="reset-user-search" class="form-control mb-3" placeholder="Cari nama atau NRP" aria-label="Cari akun untuk reset password">
+                <div class="d-flex gap-2 mb-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="reset-pick-all">Pilih Semua</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="reset-clear-all">Batalkan Pilihan</button>
+                </div>
+                <div id="reset-user-list" class="d-flex flex-column gap-2" style="max-height: 320px; overflow-y: auto" aria-live="polite"></div>
+                <p class="text-muted small mt-3 mb-0">Pilih Semua mencakup seluruh akun dalam daftar ini, termasuk halaman lainnya.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="reset-users-submit" disabled>Reset Password (0)</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="modal-import" tabindex="-1" aria-labelledby="import-personnel-title" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
@@ -276,12 +357,131 @@ document.addEventListener('DOMContentLoaded', function () {
         $.ajax({ url: editUrl, type: 'PATCH', data: $(form).serialize(), headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
             .done(done).fail(failure).always(() => { save.disabled = false; });
     });
+    document.getElementById('copy-reset-password').addEventListener('click', async () => {
+        const preview = document.getElementById('reset-password-preview');
+        try {
+            if (!navigator.clipboard) throw new Error('Clipboard unavailable');
+            await navigator.clipboard.writeText(preview.value);
+            notif('Password berhasil disalin.', 'success');
+        } catch (error) {
+            preview.focus();
+            preview.select();
+            notif('Password dipilih. Tekan Ctrl+C atau Cmd+C untuk menyalin.', 'info');
+        }
+    });
+    let confirmationPending = false;
+    let restoringResetSelection = false;
+    const confirmPasswordReset = async description => {
+        if (confirmationPending) return false;
+        confirmationPending = true;
+        const selectionElement = document.getElementById('modal-reset-passwords');
+        const restoreSelection = selectionElement.classList.contains('show');
+        const waitForModal = (element, event, action) => new Promise(resolve => {
+            element.addEventListener(event, resolve, { once: true });
+            action();
+        });
+        if (restoreSelection) {
+            await waitForModal(selectionElement, 'hidden.bs.modal', () => bootstrap.Modal.getInstance(selectionElement).hide());
+        }
+        const element = document.getElementById('modal-confirm-reset');
+        const modal = (bootstrap.Modal.getInstance(element) || new bootstrap.Modal(element));
+        const approve = document.getElementById('confirm-reset-submit');
+        document.getElementById('confirm-reset-description').textContent = description;
+        const confirmed = await new Promise(resolve => {
+            let accepted = false;
+            const accept = () => { accepted = true; approve.disabled = true; modal.hide(); };
+            approve.addEventListener('click', accept);
+            element.addEventListener('hidden.bs.modal', () => {
+                approve.removeEventListener('click', accept);
+                approve.disabled = false;
+                resolve(accepted);
+            }, { once: true });
+            modal.show();
+        });
+        if (restoreSelection) {
+            restoringResetSelection = true;
+            await waitForModal(selectionElement, 'shown.bs.modal', () => bootstrap.Modal.getInstance(selectionElement).show());
+        }
+        confirmationPending = false;
+        return confirmed;
+    };
+    const resetElement = document.getElementById('modal-reset-passwords');
+    const resetList = document.getElementById('reset-user-list');
+    const resetSearch = document.getElementById('reset-user-search');
+    const resetSubmit = document.getElementById('reset-users-submit');
+    const pickAll = document.getElementById('reset-pick-all');
+    const clearAll = document.getElementById('reset-clear-all');
+    let resetAccounts = [];
+    const selectedIds = new Set();
+    let resetting = false;
+    let loadingAccounts = false;
+    const renderAccounts = () => {
+        resetSubmit.textContent = 'Reset Password (' + selectedIds.size + ')';
+        resetSubmit.disabled = resetting || loadingAccounts || !selectedIds.size;
+        pickAll.disabled = clearAll.disabled = resetting || loadingAccounts || !resetAccounts.length;
+        resetSearch.disabled = resetting || loadingAccounts;
+        if (loadingAccounts) { resetList.textContent = 'Memuat akun...'; return; }
+        resetList.replaceChildren();
+        const query = resetSearch.value.trim().toLowerCase();
+        resetAccounts.filter(account => (account.name + ' ' + account.email).toLowerCase().includes(query)).forEach(account => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn text-start justify-content-between ' + (selectedIds.has(account.id) ? 'btn-primary' : 'btn-outline-secondary');
+            button.setAttribute('aria-pressed', String(selectedIds.has(account.id)));
+            button.disabled = resetting;
+            const label = document.createElement('span');
+            label.textContent = account.name + ' · ' + account.email;
+            const status = document.createElement('span');
+            status.textContent = selectedIds.has(account.id) ? '✓' : '+';
+            button.append(label, status);
+            button.addEventListener('click', () => {
+                if (selectedIds.has(account.id)) selectedIds.delete(account.id); else selectedIds.add(account.id);
+                renderAccounts();
+            });
+            resetList.appendChild(button);
+        });
+        if (!resetList.children.length) resetList.textContent = 'Tidak ada akun yang ditemukan.';
+    };
+    resetElement.addEventListener('show.bs.modal', () => {
+        if (restoringResetSelection) { restoringResetSelection = false; return; }
+        selectedIds.clear();
+        resetAccounts = [];
+        resetSearch.value = '';
+        loadingAccounts = true;
+        renderAccounts();
+        $.ajax({ url: @json(route('pengguna.reset-password-options')), data: { role: @json((int) $role->key) }, dataType: 'json' })
+            .done(response => { resetAccounts = response.data; })
+            .fail(failure).always(() => { loadingAccounts = false; renderAccounts(); });
+    });
+    resetElement.addEventListener('hide.bs.modal', event => { if (resetting) event.preventDefault(); });
+    resetSearch.addEventListener('input', renderAccounts);
+    pickAll.addEventListener('click', () => { resetAccounts.forEach(account => selectedIds.add(account.id)); renderAccounts(); });
+    clearAll.addEventListener('click', () => { selectedIds.clear(); renderAccounts(); });
+    resetSubmit.addEventListener('click', async () => {
+        const ids = Array.from(selectedIds);
+        if (resetting || !ids.length || !await confirmPasswordReset('Reset password untuk ' + ids.length + ' akun terpilih?')) return;
+        resetting = true;
+        renderAccounts();
+        $.ajax({ url: @json(route('pengguna.reset-passwords')), type: 'POST', contentType: 'application/json', data: JSON.stringify({ ids }), headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
+            .done(response => {
+                resetting = false;
+                bootstrap.Modal.getInstance(resetElement).hide();
+                notif(response.message, 'success');
+            }).fail(failure).always(() => { resetting = false; renderAccounts(); });
+    });
+    document.querySelectorAll('.reset-password').forEach(action => action.addEventListener('click', async () => {
+        if (action.disabled || !await confirmPasswordReset('Reset password akun "' + action.dataset.name + '"?')) return;
+        action.disabled = true;
+        $.ajax({ url: action.dataset.url, type: 'POST', headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
+            .done(response => { notif(response.message, 'success'); })
+            .fail(failure).always(() => { action.disabled = false; });
+    }));
     document.querySelectorAll('.delete-personnel').forEach(action => action.addEventListener('click', async () => {
-        if (action.disabled || !await confirmDelete('Hapus personel "' + action.dataset.name + '" beserta data kemampuannya?')) return;
+        if (action.disabled || !await confirmDelete('Hapus personel "' + action.dataset.name + '" beserta seluruh riwayat operasional dan data kemampuannya? Penghapusan ini permanen.')) return;
         action.disabled = true;
         $.ajax({ url: action.dataset.url, type: 'DELETE', headers: { 'X-CSRF-TOKEN': token }, dataType: 'json' })
             .done(() => {
-                sessionStorage.setItem('user-import-message', 'Personel berhasil dihapus.');
+                sessionStorage.setItem('user-import-message', 'Personel beserta seluruh riwayatnya berhasil dihapus.');
                 location.reload();
             }).fail(failure).always(() => { action.disabled = false; });
     }));

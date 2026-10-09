@@ -28,14 +28,14 @@
                     <div class="input-group input-group-flat">
                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
                         <span class="input-group-text">
-                            <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip">
+                            <button type="button" id="toggle-password" class="link-secondary border-0 bg-transparent p-0 d-flex align-items-center" title="Tampilkan password" aria-label="Tampilkan password" aria-controls="password" aria-pressed="false">
                                 <!-- Download SVG icon from http://tabler-icons.io/i/eye -->
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                     <circle cx="12" cy="12" r="2" />
                                     <path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" />
                                 </svg>
-                            </a>
+                            </button>
                         </span>
 
                         @error('password')
@@ -65,3 +65,19 @@
     </div>
 </div>
 @endsection
+
+@push('script')
+<script>
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('toggle-password');
+
+    togglePassword.addEventListener('click', function () {
+        const showPassword = passwordInput.type === 'password';
+        passwordInput.type = showPassword ? 'text' : 'password';
+        const label = showPassword ? 'Sembunyikan password' : 'Tampilkan password';
+        this.setAttribute('title', label);
+        this.setAttribute('aria-label', label);
+        this.setAttribute('aria-pressed', String(showPassword));
+    });
+</script>
+@endpush
