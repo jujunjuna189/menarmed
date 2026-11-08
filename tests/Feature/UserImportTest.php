@@ -12,7 +12,7 @@ use App\Imports\UsersImport;
 
 class UserImportTest extends TestCase
 {
-    // use RefreshDatabase; 
+    use RefreshDatabase;
 
     public function test_download_template()
     {

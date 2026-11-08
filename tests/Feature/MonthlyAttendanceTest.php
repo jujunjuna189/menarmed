@@ -36,11 +36,11 @@ class MonthlyAttendanceTest extends TestCase
         $month = Carbon::createFromFormat('!Y-m', '2024-02');
         DB::table('absensi')->where('ket', 'HADIR')->update(['latitude' => '-6.2', 'longitude' => '106.8']);
         $export = new MonthlyAbsensiExport($month, '');
-        $this->assertCount(31, $export->headings());
+        $this->assertCount(32, $export->headings());
         $row = $export->collection()->first();
         $this->assertSame('-', $row[2]);
-        $this->assertSame('H/I', $row[3]);
-        $this->assertSame('DD', $row[30]);
+        $this->assertSame('H/I', $row[4]);
+        $this->assertSame('DD', $row[31]);
         $this->assertCount(2, MonthlyAttendance::records($month, [$person->id]));
         $this->assertSame('BP', MonthlyAttendance::code('BP'));
         $admin = User::create(['name' => 'Admin', 'email' => 'admin', 'password' => 'test', 'role' => 1]);

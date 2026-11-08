@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserImportRefinedTest extends TestCase
 {
-    // use RefreshDatabase; // Use only if you have a separate test DB
+    use RefreshDatabase;
 
     public function test_import_users_with_all_fields()
     {

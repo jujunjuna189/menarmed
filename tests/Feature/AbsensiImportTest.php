@@ -13,7 +13,7 @@ use App\Imports\AbsensiImport;
 
 class AbsensiImportTest extends TestCase
 {
-    // use RefreshDatabase; 
+    use RefreshDatabase;
 
     public function test_download_template_absensi()
     {

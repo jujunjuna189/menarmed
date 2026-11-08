@@ -11,7 +11,7 @@ use App\Exports\AbsensiExport;
 
 class RekapAbsensiExportTest extends TestCase
 {
-    // use RefreshDatabase; 
+    use RefreshDatabase;
 
     public function test_export_absensi()
     {
@@ -24,7 +24,7 @@ class RekapAbsensiExportTest extends TestCase
 
         $response->assertStatus(200);
         
-        Excel::assertDownloaded('rekap_absensi.xlsx', function(AbsensiExport $export) {
+        Excel::assertDownloaded('rekap_absensi_' . date('Y-m-01') . '_to_' . date('Y-m-t') . '.xlsx', function(AbsensiExport $export) {
             // Verify that the collection matches what we expect
             // Since we just seeded massive data, we probably just want to check if it returns a collection
             return $export->collection()->count() >= 0; 
